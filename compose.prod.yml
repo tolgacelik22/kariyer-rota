@@ -31,6 +31,7 @@ services:
       - DB_PORT=5432
       - JWT_SECRET=${JWT_SECRET}
       - PRODUCTION_DOMAIN=${PRODUCTION_DOMAIN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy

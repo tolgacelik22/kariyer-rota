@@ -128,8 +128,9 @@ JSON döndür (kısa ve öz):
  * Generate conversation continuation using OpenAI
  */
 async function generateConversationResponse(conversation, newSituation) {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not set');
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey || apiKey === 'sk-your-openai-api-key-here' || apiKey.trim() === '') {
+    throw new Error('OPENAI_API_KEY is not set or is invalid. Please set it in .env.prod file.');
   }
 
   const prompt = buildConversationPrompt(conversation, newSituation);
