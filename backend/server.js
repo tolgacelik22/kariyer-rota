@@ -920,7 +920,19 @@ app.post('/api/conversations/:conversationId/continue', async (req, res) => {
         actionPlan = actionPlanOriginal;
       }
     } catch (aiError) {
-      console.error('OpenAI error, falling back to simple analysis:', aiError);
+      // Handle different error types
+      const errorMessage = aiError.message || '';
+      
+      if (errorMessage === 'QUOTA_EXCEEDED') {
+        console.warn('[OpenAI] Quota exceeded - using fallback analysis. Please check OpenAI billing.');
+      } else if (errorMessage === 'RATE_LIMIT') {
+        console.warn('[OpenAI] Rate limit exceeded - using fallback analysis. Please wait before retrying.');
+      } else if (errorMessage === 'INVALID_API_KEY') {
+        console.error('[OpenAI] Invalid API key - check OPENAI_API_KEY in .env.prod');
+      } else {
+        console.error('OpenAI error, falling back to simple analysis:', aiError.message);
+      }
+      
       // Fallback to simple keyword-based analysis if OpenAI fails
       const situationLower = newSituation.toLowerCase();
       

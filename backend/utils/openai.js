@@ -128,9 +128,13 @@ JSON döndür (kısa ve öz):
  * Generate conversation continuation using OpenAI
  */
 async function generateConversationResponse(conversation, newSituation) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey || apiKey === 'sk-your-openai-api-key-here' || apiKey.trim() === '') {
-    throw new Error('OPENAI_API_KEY is not set or is invalid. Please set it in .env.prod file.');
+  // Check if OpenAI is configured
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey === 'sk-your-openai-api-key-here' || apiKey.trim() === '') {
+      throw new Error('OPENAI_API_KEY is not set or is invalid. Please set it in .env.prod file.');
+    }
+    throw new Error('OpenAI client not initialized');
   }
 
   const prompt = buildConversationPrompt(conversation, newSituation);
@@ -176,6 +180,23 @@ async function generateConversationResponse(conversation, newSituation) {
       _model: DEFAULT_MODEL
     };
   } catch (error) {
+    // Handle specific error types
+    if (error.status === 429) {
+      if (error.code === 'insufficient_quota' || error.type === 'insufficient_quota') {
+        console.error('[OpenAI] Quota exceeded - falling back to simple analysis');
+        throw new Error('QUOTA_EXCEEDED');
+      } else {
+        console.error('[OpenAI] Rate limit exceeded - too many requests');
+        throw new Error('RATE_LIMIT');
+      }
+    } else if (error.status === 401) {
+      console.error('[OpenAI] Invalid API key');
+      throw new Error('INVALID_API_KEY');
+    } else if (error.status === 500 || error.status === 503) {
+      console.error('[OpenAI] Service unavailable');
+      throw new Error('SERVICE_UNAVAILABLE');
+    }
+    
     console.error('OpenAI API Error:', error);
     throw new Error(`AI yanıt oluşturulamadı: ${error.message}`);
   }
