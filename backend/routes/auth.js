@@ -158,6 +158,7 @@ router.post('/login', async (req, res) => {
 router.post('/guest', async (req, res) => {
   try {
     let userId = req.body.userId;
+    let userIdInt = null;
 
     if (!userId) {
       // Create a temporary guest user
@@ -172,17 +173,50 @@ router.post('/guest', async (req, res) => {
         [guestEmail, passwordHash, 100, 'FREE', new Date().toISOString().split('T')[0], [], [], {}]
       );
 
-      userId = result.rows[0].id.toString();
+      userIdInt = result.rows[0].id;
+      userId = userIdInt.toString();
     } else {
-      // Check if user exists
-      const result = await pool.query('SELECT * FROM users WHERE id = $1', [parseInt(userId)]);
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+      // Validate and parse userId
+      userIdInt = parseInt(userId);
+      if (isNaN(userIdInt)) {
+        // If userId is not a valid number, create a new guest user
+        const guestEmail = `guest_${Date.now()}@guest.com`;
+        const tempPassword = Math.random().toString(36).slice(-12);
+        const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+        const result = await pool.query(
+          `INSERT INTO users (email, password_hash, balance, tier, last_login_date, completed_modules, completed_quests, skills)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           RETURNING id, email, name, balance, tier, completed_modules, completed_quests, skills, last_login_date`,
+          [guestEmail, passwordHash, 100, 'FREE', new Date().toISOString().split('T')[0], [], [], {}]
+        );
+
+        userIdInt = result.rows[0].id;
+        userId = userIdInt.toString();
+      } else {
+        // Check if user exists
+        const result = await pool.query('SELECT * FROM users WHERE id = $1', [userIdInt]);
+        if (result.rows.length === 0) {
+          // User doesn't exist, create a new one
+          const guestEmail = `guest_${Date.now()}@guest.com`;
+          const tempPassword = Math.random().toString(36).slice(-12);
+          const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+          const createResult = await pool.query(
+            `INSERT INTO users (email, password_hash, balance, tier, last_login_date, completed_modules, completed_quests, skills)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+             RETURNING id, email, name, balance, tier, completed_modules, completed_quests, skills, last_login_date`,
+            [guestEmail, passwordHash, 100, 'FREE', new Date().toISOString().split('T')[0], [], [], {}]
+          );
+
+          userIdInt = createResult.rows[0].id;
+          userId = userIdInt.toString();
+        }
       }
     }
 
     // Get user data
-    const result = await pool.query('SELECT * FROM users WHERE id = $1', [parseInt(userId)]);
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [userIdInt]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
     }
@@ -194,18 +228,23 @@ router.post('/guest', async (req, res) => {
     let rewardAmount = 0;
 
     // Daily Reward Logic - check if last_login_date is null or different from today
-    const lastLoginDate = user.last_login_date ? user.last_login_date.toISOString().split('T')[0] : null;
+    const lastLoginDate = user.last_login_date 
+      ? (user.last_login_date instanceof Date 
+          ? user.last_login_date.toISOString().split('T')[0] 
+          : user.last_login_date.toString().split('T')[0])
+      : null;
+    
     if (!lastLoginDate || lastLoginDate !== today) {
       rewardAmount = userTier.dailyReward;
       await pool.query(
         'UPDATE users SET balance = balance + $1, last_login_date = $2 WHERE id = $3',
-        [rewardAmount, today, user.id]
+        [rewardAmount, today, userIdInt]
       );
       rewardGranted = true;
     }
 
     // Get updated balance
-    const updatedUser = await pool.query('SELECT balance FROM users WHERE id = $1', [user.id]);
+    const updatedUser = await pool.query('SELECT balance FROM users WHERE id = $1', [userIdInt]);
 
     // Get total modules count from database
     const modulesCount = await pool.query('SELECT COUNT(*) FROM modules');
