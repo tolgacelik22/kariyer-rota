@@ -86,11 +86,11 @@ fi
 
 # Stop existing containers (optional, but recommended)
 echo "🛑 Mevcut container'lar durduruluyor..."
-$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" down || true
+$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" --env-file "$ENV_FILE" down || true
 
-# Build and start services
+# Build and start services with env file
 echo "🔨 Servisler build ediliyor ve başlatılıyor..."
-$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" up -d --build
+$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build
 
 # Wait for services to be ready
 echo "⏳ Servislerin hazır olması bekleniyor..."
@@ -99,7 +99,7 @@ sleep 10
 # Check if services are running
 echo ""
 echo "🔍 Servis durumu:"
-$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" ps
+$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" --env-file "$ENV_FILE" ps
 
 # Wait for API to be healthy
 echo ""
