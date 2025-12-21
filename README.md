@@ -256,25 +256,44 @@ cd frontend
 npm install
 ```
 
-3. Expo'yu başlatın:
+3. (Opsiyonel) API URL'ini yapılandırın:
+```bash
+cp .env.example .env
+# .env dosyasını düzenleyerek API URL'ini ayarlayın
+# Production için varsayılan: https://kariyer-rota-api.magicdigital.org/api
+# Development için: http://localhost:4000/api veya http://YOUR_LOCAL_IP:4000/api
+```
+
+4. Expo'yu başlatın:
 ```bash
 npx expo start
 ```
 
-4. QR kodu tarayın veya simülatörde açın:
+5. QR kodu tarayın veya simülatörde açın:
    - **iOS**: `i` tuşuna basın
    - **Android**: `a` tuşuna basın
    - **Fiziksel Cihaz**: Expo Go uygulaması ile QR kodu tarayın
 
+**Not:** Varsayılan olarak frontend production API'ye (`https://kariyer-rota-api.magicdigital.org/api`) bağlanır. Local development için `.env` dosyasında `EXPO_PUBLIC_API_URL` değişkenini ayarlayın.
+
 ### ⚠️ Önemli Notlar
 
-- **Fiziksel Cihaz Kullanımı**: Telefonunuzdan test ediyorsanız, `frontend/src/api.js` dosyasındaki IP adresini bilgisayarınızın yerel IP adresiyle güncelleyin:
-  ```javascript
-  const DEV_API_URL = 'http://YOUR_LOCAL_IP:4000/api';
+- **Production API**: Varsayılan olarak frontend production API'ye bağlanır: `https://kariyer-rota-api.magicdigital.org/api`
+- **Local Development**: Local backend kullanmak için `frontend/.env` dosyası oluşturun:
+  ```bash
+  cd frontend
+  echo "EXPO_PUBLIC_API_URL=http://localhost:4000/api" > .env
+  ```
+- **Fiziksel Cihaz ile Local Development**: Telefonunuzdan local backend'e bağlanmak için:
+  ```bash
+  # .env dosyasında bilgisayarınızın yerel IP adresini kullanın:
+  echo "EXPO_PUBLIC_API_URL=http://YOUR_LOCAL_IP:4000/api" > frontend/.env
   ```
   IP adresinizi bulmak için:
   ```bash
   ifconfig | grep "inet " | grep -v 127.0.0.1
+  # veya macOS'ta:
+  ipconfig getifaddr en0
   ```
 
 ---
