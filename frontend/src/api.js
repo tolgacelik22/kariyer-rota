@@ -13,10 +13,15 @@ const DEV_API_URL = Platform.OS === 'android'
   : 'http://localhost:4000/api';
 
 // Use environment variable or default to production
-// Set EXPO_PUBLIC_API_URL in .env file or expo config to override
+// Set EXPO_PUBLIC_API_URL in .env file to override
 // For development: EXPO_PUBLIC_API_URL=http://localhost:4000/api
-// For production: EXPO_PUBLIC_API_URL=https://kariyer-rota-api.magicdigital.org/api
+// For production: EXPO_PUBLIC_API_URL=https://kariyer-rota-api.magicdigital.org/api (default)
 const API_URL = process.env.EXPO_PUBLIC_API_URL || PRODUCTION_API_URL;
+
+// Log API URL in development
+if (__DEV__) {
+  console.log(`[API] Using API URL: ${API_URL}`);
+}
 
 // NOTE: If you are running on a physical device in development mode,
 // make sure the IP matches your computer's local IP

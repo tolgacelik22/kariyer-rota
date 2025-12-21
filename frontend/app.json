@@ -20,6 +20,9 @@
       "adaptiveIcon": {
         "backgroundColor": "#1E3A8A"
       }
+    },
+    "extra": {
+      "apiUrl": "https://kariyer-rota-api.magicdigital.org/api"
     }
   }
 }
