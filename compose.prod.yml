@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: kariyer-rota-api-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-kariyerrota}
+    volumes:
+      - kariyer_rota_postgres_data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kariyer-rota-api
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB:-kariyerrota}
+      - DB_PORT=5432
+      - JWT_SECRET=${JWT_SECRET}
+      - PRODUCTION_DOMAIN=${PRODUCTION_DOMAIN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - traefik-net
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.kariyer-rota-api.rule=Host(`${PRODUCTION_DOMAIN}`)"
+      - "traefik.http.routers.kariyer-rota-api.entrypoints=websecure"
+      - "traefik.http.routers.kariyer-rota-api.tls=true"
+      - "traefik.http.routers.kariyer-rota-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kariyer-rota-api.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  traefik-net:
+    external: true
+
+volumes:
+  kariyer_rota_postgres_data:
+    driver: local
+
