@@ -33,14 +33,16 @@ async function addConversationStep(conversationId, stepData) {
       situation,
       feedback,
       actionPlan,
+      actionPlanOriginal,
       traits,
-      totalScore
+      totalScore,
+      aiUsage
     } = stepData;
     
     await pool.query(
       `INSERT INTO conversation_steps 
-       (conversation_id, step_number, step_type, answers, situation, feedback, action_plan, traits, total_score)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+       (conversation_id, step_number, step_type, answers, situation, feedback, action_plan, action_plan_original, traits, total_score, ai_usage)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         conversationId,
         stepNumber,
@@ -49,8 +51,10 @@ async function addConversationStep(conversationId, stepData) {
         situation || null,
         feedback,
         actionPlan || [],
+        actionPlanOriginal || actionPlan || [], // Store original if provided
         traits ? JSON.stringify(traits) : null,
-        totalScore
+        totalScore,
+        aiUsage ? JSON.stringify(aiUsage) : null
       ]
     );
     
@@ -95,17 +99,31 @@ async function getConversationById(conversationId, userId = null) {
       [conversationId]
     );
     
-    const steps = stepsResult.rows.map(row => ({
-      stepNumber: row.step_number,
-      type: row.step_type,
-      answers: row.answers ? (typeof row.answers === 'string' ? JSON.parse(row.answers) : row.answers) : null,
-      situation: row.situation,
-      feedback: row.feedback,
-      actionPlan: row.action_plan || [],
-      traits: row.traits ? (typeof row.traits === 'string' ? JSON.parse(row.traits) : row.traits) : null,
-      totalScore: row.total_score,
-      timestamp: row.timestamp
-    }));
+    const steps = stepsResult.rows.map(row => {
+      const step = {
+        stepNumber: row.step_number,
+        type: row.step_type,
+        answers: row.answers ? (typeof row.answers === 'string' ? JSON.parse(row.answers) : row.answers) : null,
+        situation: row.situation,
+        feedback: row.feedback,
+        actionPlan: row.action_plan || [],
+        traits: row.traits ? (typeof row.traits === 'string' ? JSON.parse(row.traits) : row.traits) : null,
+        totalScore: row.total_score,
+        timestamp: row.timestamp
+      };
+      
+      // Include original action plan if available (for tier upgrades)
+      if (row.action_plan_original && row.action_plan_original.length > 0) {
+        step.actionPlanOriginal = row.action_plan_original;
+      }
+      
+      // Include AI usage data if available
+      if (row.ai_usage) {
+        step.aiUsage = typeof row.ai_usage === 'string' ? JSON.parse(row.ai_usage) : row.ai_usage;
+      }
+      
+      return step;
+    });
     
     return {
       id: conversation.id,

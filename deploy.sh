@@ -127,6 +127,14 @@ fi
 
 # Run database migrations (idempotent)
 echo ""
+echo "📊 Database migration'ları çalıştırılıyor..."
+
+# Run schema migration for action_plan_original and ai_usage columns
+$COMPOSE_CMD -p "$PROJECT_NAME" -f "$COMPOSE_FILE" --env-file "$ENV_FILE" exec -T api node db/migrate-add-action-plan-original.js 2>/dev/null || {
+    echo -e "${YELLOW}⚠️  Schema migration zaten uygulanmış veya atlandı${NC}"
+}
+
+echo ""
 echo "📊 Database migration'ları kontrol ediliyor..."
 
 # Check if modules table exists and has data

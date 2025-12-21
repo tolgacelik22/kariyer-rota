@@ -71,8 +71,10 @@ CREATE TABLE IF NOT EXISTS conversation_steps (
     situation TEXT,
     feedback TEXT,
     action_plan TEXT[],
+    action_plan_original TEXT[], -- Store original action plan (for tier upgrades)
     traits JSONB,
     total_score INTEGER,
+    ai_usage JSONB, -- Store AI usage data (tokens, cost, model)
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(conversation_id, step_number)
 );

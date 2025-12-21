@@ -133,7 +133,9 @@ const ConversationScreen = ({ route, navigation }) => {
                 <View style={styles.actionPlanCard}>
                   <Text style={styles.actionPlanTitle}>Aksiyon Planı:</Text>
                   {step.actionPlan.map((item, idx) => (
-                    <Text key={idx} style={styles.actionPlanItem}>• {item}</Text>
+                    <Text key={idx} style={styles.actionPlanItem}>
+                      • {item.replace('🔒 ', '')}
+                    </Text>
                   ))}
                 </View>
               )}

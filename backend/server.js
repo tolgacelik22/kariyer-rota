@@ -802,14 +802,19 @@ app.get('/api/conversations/:conversationId', async (req, res) => {
           if (step.actionPlan && step.actionPlan.length > 0) {
             const isLocked = step.actionPlan[0] && step.actionPlan[0].includes('🔒');
             
-            // If locked but user now has access, regenerate actionPlan based on feedback/context
+            // If locked but user now has access, show original action plan
             if (isLocked && userTier.canSeeActionPlan) {
-              // Generate a generic action plan since we don't store original
-              filteredStep.actionPlan = [
-                "Öğrendiklerinizi uygulamaya koyun.",
-                "Gelişim alanlarınızı belirleyin ve çalışın.",
-                "Düzenli geri bildirim alın ve ilerlemeyi takip edin."
-              ];
+              // Use original action plan if available (from tier upgrade)
+              if (step.actionPlanOriginal && step.actionPlanOriginal.length > 0) {
+                filteredStep.actionPlan = step.actionPlanOriginal;
+              } else {
+                // Fallback if original not available
+                filteredStep.actionPlan = [
+                  "Öğrendiklerinizi uygulamaya koyun.",
+                  "Gelişim alanlarınızı belirleyin ve çalışın.",
+                  "Düzenli geri bildirim alın ve ilerlemeyi takip edin."
+                ];
+              }
             } else if (!userTier.canSeeActionPlan && !isLocked) {
               // If user downgraded, lock the action plan
               filteredStep.actionPlan = ["🔒 Detaylı aksiyon planı sadece BRONZE ve üzeri üyeler içindir."];
@@ -879,58 +884,70 @@ app.post('/api/conversations/:conversationId/continue', async (req, res) => {
       );
     }
 
-    // Analyze new situation based on conversation context
-    const previousStep = conversation.steps[conversation.steps.length - 1];
-    const situationLower = newSituation.toLowerCase();
-    
+    // Use OpenAI to generate response
     let feedback = "";
     let actionPlan = [];
+    let actionPlanOriginal = [];
     let traits = {};
     let totalScore = 0;
+    let aiUsage = null;
 
-    // Context-aware analysis
-    if (situationLower.includes('sonuç') || situationLower.includes('oldu') || situationLower.includes('yaptım')) {
-      feedback = "Aldığınız aksiyonları değerlendirdik. Sonuçlara göre bir sonraki adımları planlayalım.";
-      actionPlan = [
-        "Sonuçları objektif olarak değerlendirin ve öğrenilen dersleri not edin.",
-        "Başarılı olan yaklaşımları gelecekte de kullanın.",
-        "Geliştirilmesi gereken noktalar için yeni stratejiler belirleyin."
-      ];
-      traits = { reflection: 8, learning: 9, adaptability: 7 };
-      totalScore = 80;
-    } else if (situationLower.includes('sorun') || situationLower.includes('problem') || situationLower.includes('zorluk')) {
-      feedback = "Yeni bir zorlukla karşılaştınız. Önceki deneyimlerinizden öğrendiklerinizi uygulayın.";
-      actionPlan = [
-        "Önceki adımlarda öğrendiklerinizi hatırlayın ve uygulayın.",
-        "Sorunu küçük parçalara bölerek çözüm üretin.",
-        "Gerekirse destek alın veya alternatif yaklaşımlar deneyin."
-      ];
-      traits = { problemSolving: 8, resilience: 9, strategic: 7 };
-      totalScore = 80;
-    } else if (situationLower.includes('ilerleme') || situationLower.includes('gelişme') || situationLower.includes('başarı')) {
-      feedback = "Harika bir ilerleme kaydediyorsunuz! Bu momentumu koruyun.";
-      actionPlan = [
-        "Başarılarınızı kutlayın ve motivasyonunuzu koruyun.",
-        "Bir sonraki hedefi belirleyin ve plan yapın.",
-        "Bu başarıyı başkalarıyla paylaşın ve mentorluk yapın."
-      ];
-      traits = { achievement: 9, motivation: 9, leadership: 8 };
-      totalScore = 87;
-    } else {
-      // Generic continuation
-      feedback = "Yeni durumu değerlendirdik. Hikayeniz devam ediyor, doğru adımlarla ilerleyin.";
-      actionPlan = [
-        "Önceki adımlardan öğrendiklerinizi uygulayın.",
-        "Yeni duruma uygun strateji geliştirin.",
-        "İlerlemeyi takip edin ve gerekirse ayarlamalar yapın."
-      ];
-      traits = { adaptability: 8, strategic: 7, learning: 8 };
-      totalScore = 77;
-    }
+    try {
+      const { generateConversationResponse } = require('./utils/openai');
+      const aiResponse = await generateConversationResponse(conversation, newSituation.trim());
+      
+      feedback = aiResponse.feedback || "Yeni durumunuz değerlendirildi.";
+      actionPlanOriginal = aiResponse.actionPlan || [];
+      traits = aiResponse.traits || {};
+      totalScore = aiResponse.totalScore || 75;
+      aiUsage = aiResponse._cost || null;
 
-    // Tier Restrictions
-    if (!userTier.canSeeActionPlan) {
-      actionPlan = ["🔒 Detaylı aksiyon planı sadece BRONZE ve üzeri üyeler içindir."];
+      // Store original action plan, but show filtered version based on tier
+      if (!userTier.canSeeActionPlan) {
+        actionPlan = ["🔒 Detaylı aksiyon planı sadece BRONZE ve üzeri üyeler içindir."];
+      } else {
+        actionPlan = actionPlanOriginal;
+      }
+    } catch (aiError) {
+      console.error('OpenAI error, falling back to simple analysis:', aiError);
+      // Fallback to simple keyword-based analysis if OpenAI fails
+      const situationLower = newSituation.toLowerCase();
+      
+      if (situationLower.includes('sonuç') || situationLower.includes('oldu') || situationLower.includes('yaptım')) {
+        feedback = "Aldığınız aksiyonları değerlendirdik. Sonuçlara göre bir sonraki adımları planlayalım.";
+        actionPlanOriginal = [
+          "Sonuçları objektif olarak değerlendirin ve öğrenilen dersleri not edin.",
+          "Başarılı olan yaklaşımları gelecekte de kullanın.",
+          "Geliştirilmesi gereken noktalar için yeni stratejiler belirleyin."
+        ];
+        traits = { reflection: 8, learning: 9, adaptability: 7 };
+        totalScore = 80;
+      } else if (situationLower.includes('sorun') || situationLower.includes('problem') || situationLower.includes('zorluk')) {
+        feedback = "Yeni bir zorlukla karşılaştınız. Önceki deneyimlerinizden öğrendiklerinizi uygulayın.";
+        actionPlanOriginal = [
+          "Önceki adımlarda öğrendiklerinizi hatırlayın ve uygulayın.",
+          "Sorunu küçük parçalara bölerek çözüm üretin.",
+          "Gerekirse destek alın veya alternatif yaklaşımlar deneyin."
+        ];
+        traits = { problemSolving: 8, resilience: 9, strategic: 7 };
+        totalScore = 80;
+      } else {
+        feedback = "Yeni durumu değerlendirdik. Hikayeniz devam ediyor, doğru adımlarla ilerleyin.";
+        actionPlanOriginal = [
+          "Önceki adımlardan öğrendiklerinizi uygulayın.",
+          "Yeni duruma uygun strateji geliştirin.",
+          "İlerlemeyi takip edin ve gerekirse ayarlamalar yapın."
+        ];
+        traits = { adaptability: 8, strategic: 7, learning: 8 };
+        totalScore = 77;
+      }
+
+      // Tier Restrictions
+      if (!userTier.canSeeActionPlan) {
+        actionPlan = ["🔒 Detaylı aksiyon planı sadece BRONZE ve üzeri üyeler içindir."];
+      } else {
+        actionPlan = actionPlanOriginal;
+      }
     }
 
     // Add new step to conversation in database
@@ -941,9 +958,11 @@ app.post('/api/conversations/:conversationId/continue', async (req, res) => {
       answers: null,
       situation: newSituation.trim(),
       feedback: feedback,
-      actionPlan: actionPlan,
+      actionPlan: actionPlan, // Filtered based on tier
+      actionPlanOriginal: actionPlanOriginal, // Always store original
       traits: traits,
-      totalScore: totalScore
+      totalScore: totalScore,
+      aiUsage: aiUsage
     });
 
     // Get updated balance
