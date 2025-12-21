@@ -893,7 +893,13 @@ app.post('/api/conversations/:conversationId/continue', async (req, res) => {
     let aiUsage = null;
 
     try {
-      const { generateConversationResponse } = require('./utils/openai');
+      const { generateConversationResponse, getConversationStats, logUsage } = require('./utils/openai');
+      
+      // Log conversation stats before AI call (for monitoring)
+      const stats = getConversationStats(conversation);
+      console.log(`[Conversation] ID: ${conversationId}, Steps: ${stats.totalSteps}, Est. tokens in history: ${stats.estimatedTokens}`);
+      
+      // Generate AI response with summarized history
       const aiResponse = await generateConversationResponse(conversation, newSituation.trim());
       
       feedback = aiResponse.feedback || "Yeni durumunuz değerlendirildi.";
@@ -901,6 +907,11 @@ app.post('/api/conversations/:conversationId/continue', async (req, res) => {
       traits = aiResponse.traits || {};
       totalScore = aiResponse.totalScore || 75;
       aiUsage = aiResponse._cost || null;
+      
+      // Log usage for analytics
+      if (aiUsage) {
+        logUsage(userId, aiResponse._model || 'gpt-4o-mini', aiUsage, aiUsage.tokens, conversationId);
+      }
 
       // Store original action plan, but show filtered version based on tier
       if (!userTier.canSeeActionPlan) {
