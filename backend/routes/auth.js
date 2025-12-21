@@ -193,8 +193,9 @@ router.post('/guest', async (req, res) => {
     let rewardGranted = false;
     let rewardAmount = 0;
 
-    // Daily Reward Logic
-    if (user.last_login_date !== today) {
+    // Daily Reward Logic - check if last_login_date is null or different from today
+    const lastLoginDate = user.last_login_date ? user.last_login_date.toISOString().split('T')[0] : null;
+    if (!lastLoginDate || lastLoginDate !== today) {
       rewardAmount = userTier.dailyReward;
       await pool.query(
         'UPDATE users SET balance = balance + $1, last_login_date = $2 WHERE id = $3',
@@ -206,6 +207,16 @@ router.post('/guest', async (req, res) => {
     // Get updated balance
     const updatedUser = await pool.query('SELECT balance FROM users WHERE id = $1', [user.id]);
 
+    // Get total modules count from database
+    const modulesCount = await pool.query('SELECT COUNT(*) FROM modules');
+    const totalModules = parseInt(modulesCount.rows[0].count) || 10;
+
+    // Get category progress
+    const { getCategoryProgress } = require('../utils/userHelpers');
+    const categoryProgress = getCategoryProgress({
+      completedModules: user.completed_modules || []
+    });
+
     res.json({
       userId: user.id.toString(),
       name: user.name || null,
@@ -215,9 +226,10 @@ router.post('/guest', async (req, res) => {
       rewardAmount,
       completedModules: user.completed_modules || [],
       completedModulesCount: (user.completed_modules || []).length,
-      totalModules: 10, // Total modules count
+      totalModules: totalModules,
       skills: normalizeSkillsTo100(user.skills || {}),
       completedQuests: user.completed_quests || [],
+      categoryProgress: categoryProgress,
       message: 'Success'
     });
   } catch (error) {
