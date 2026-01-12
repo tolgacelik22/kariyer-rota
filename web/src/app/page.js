@@ -46,6 +46,17 @@ const QUESTIONS = [
     step: 1,
   },
   {
+    id: 'work_model',
+    type: 'radio',
+    label: 'Size En Uygun Çalışma Modeli',
+    options: [
+      { value: 'remote', label: 'Tamamen Uzaktan (Remote)' },
+      { value: 'hybrid', label: 'Hibrit (Ofis + Uzaktan)' },
+      { value: 'office', label: 'Tam Zamanlı Ofis' },
+      { value: 'freelance', label: 'Proje Bazlı / Freelance' },
+    ],
+  },
+  {
     id: 'difficulty',
     type: 'textarea',
     label: 'Şu an iş hayatında en çok zorlandığınız profesyonel konu nedir?',
@@ -54,7 +65,10 @@ const QUESTIONS = [
 ];
 
 function QuizContent() {
-  const [answers, setAnswers] = useState({});
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState({
+    risk_tolerance: 5 // Default for range
+  });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,6 +93,20 @@ function QuizContent() {
 
   const handleChange = (id, value) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const nextStep = () => {
+    if (step < QUESTIONS.length - 1) {
+      setStep(step + 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const prevStep = () => {
+    if (step > 0) {
+      setStep(step - 1);
+      window.scrollTo(0, 0);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -114,100 +142,150 @@ function QuizContent() {
     }
   };
 
+  const currentQuestion = QUESTIONS[step];
+  const isLastStep = step === QUESTIONS.length - 1;
+  const progress = ((step + 1) / QUESTIONS.length) * 100;
+
+  // Simple validation to enable "Next"
+  const canContinue = answers[currentQuestion.id] !== undefined && answers[currentQuestion.id] !== '';
+
   return (
-    <main className="min-h-screen bg-white py-12 px-6 text-gray-800 font-sans">
-      <div className="max-w-xl mx-auto space-y-12">
-        <header className="text-center space-y-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-            Kariyer Analiz Formu
+    <main className="min-h-screen bg-white py-12 px-6 text-gray-800 font-sans flex flex-col items-center">
+      <div className="max-w-xl w-full space-y-12">
+        <header className="space-y-6 text-center">
+          <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#1f3a8a]">
+              Analiz Süreci: Adım {step + 1} / {QUESTIONS.length}
+            </p>
+            <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+              <div
+                className="bg-[#1f3a8a] h-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            {step === 0 ? 'Kariyer Stratejinizi Belirleyelim' : 'Durum Analizi Devam Ediyor'}
           </h1>
-          <p className="text-gray-500 font-light max-w-sm mx-auto">
-            Profesyonel durumunuzu 2 dakikada analiz edin ve stratejik raporunuzu hazırlayalım.
-          </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="space-y-10 border-t border-gray-100 pt-10">
-          {QUESTIONS.map((q) => (
-            <div key={q.id} className="space-y-4">
-              <label className="block text-sm font-bold text-gray-700 uppercase tracking-wider">
-                {q.label}
+        <div className="min-h-[300px] flex flex-col justify-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <form onSubmit={isLastStep ? handleSubmit : (e) => e.preventDefault()} className="space-y-10">
+            <div className="space-y-6">
+              <label className="block text-lg font-bold text-gray-800 leading-tight">
+                {currentQuestion.label}
               </label>
 
-              {q.type === 'select' && (
+              {currentQuestion.type === 'select' && (
                 <select
                   required
-                  className="w-full border-b-2 border-gray-100 focus:border-[#1f3a8a] py-3 bg-transparent focus:outline-none transition-colors"
-                  onChange={(e) => handleChange(q.id, e.target.value)}
+                  value={answers[currentQuestion.id] || ''}
+                  className="w-full border-b-2 border-gray-100 focus:border-[#1f3a8a] py-4 bg-transparent focus:outline-none transition-colors text-lg"
+                  onChange={(e) => handleChange(currentQuestion.id, e.target.value)}
                 >
                   <option value="">Seçiniz</option>
-                  {q.options.map((opt) => (
+                  {currentQuestion.options.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
               )}
 
-              {q.type === 'radio' && (
-                <div className="grid grid-cols-2 gap-3">
-                  {q.options.map((opt) => (
+              {currentQuestion.type === 'radio' && (
+                <div className="grid gap-3">
+                  {currentQuestion.options.map((opt) => (
                     <label key={opt.value} className={`
-                      border-2 rounded-md p-4 flex items-center justify-center cursor-pointer transition-all
-                      ${answers[q.id] === opt.value ? 'border-[#1f3a8a] bg-blue-50 text-[#1f3a8a]' : 'border-gray-100 hover:border-gray-200'}
-                    `}>
+                                    border-2 rounded-xl p-5 flex items-center cursor-pointer transition-all
+                                    ${answers[currentQuestion.id] === opt.value ? 'border-[#1f3a8a] bg-blue-50 text-[#1f3a8a]' : 'border-gray-50 hover:border-gray-200'}
+                                `}>
                       <input
                         type="radio"
-                        name={q.id}
+                        name={currentQuestion.id}
                         required
                         className="sr-only"
                         value={opt.value}
-                        onChange={(e) => handleChange(q.id, e.target.value)}
+                        checked={answers[currentQuestion.id] === opt.value}
+                        onChange={(e) => handleChange(currentQuestion.id, e.target.value)}
                       />
-                      <span className="text-sm font-medium">{opt.label}</span>
+                      <div className="flex items-center gap-4">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${answers[currentQuestion.id] === opt.value ? 'border-[#1f3a8a]' : 'border-gray-300'}`}>
+                          {answers[currentQuestion.id] === opt.value && <div className="w-2.5 h-2.5 bg-[#1f3a8a] rounded-full" />}
+                        </div>
+                        <span className="text-base font-bold">{opt.label}</span>
+                      </div>
                     </label>
                   ))}
                 </div>
               )}
 
-              {q.type === 'range' && (
-                <div className="space-y-4 pt-2">
+              {currentQuestion.type === 'range' && (
+                <div className="space-y-6 pt-4">
+                  <div className="text-center text-4xl font-black text-[#1f3a8a] mb-2">
+                    {answers[currentQuestion.id] || 5}
+                  </div>
                   <input
                     type="range"
-                    min={q.min}
-                    max={q.max}
-                    step={q.step}
-                    className="w-full h-1 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#1f3a8a]"
-                    onChange={(e) => handleChange(q.id, e.target.value)}
+                    min={currentQuestion.min}
+                    max={currentQuestion.max}
+                    step={currentQuestion.step}
+                    value={answers[currentQuestion.id] || 5}
+                    className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#1f3a8a]"
+                    onChange={(e) => handleChange(currentQuestion.id, e.target.value)}
                   />
-                  <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    <span>Çekimser</span>
-                    <span>Atılgan</span>
+                  <div className="flex justify-between text-[11px] text-gray-400 font-bold uppercase tracking-widest">
+                    <span>Riskten Kaçınan</span>
+                    <span>Yüksek Atılganlık</span>
                   </div>
                 </div>
               )}
 
-              {q.type === 'textarea' && (
+              {currentQuestion.type === 'textarea' && (
                 <textarea
                   required
-                  rows={4}
-                  placeholder={q.placeholder}
-                  className="w-full border-2 border-gray-100 rounded-md p-4 focus:outline-none focus:border-[#1f3a8a] transition-colors"
-                  onChange={(e) => handleChange(q.id, e.target.value)}
+                  rows={6}
+                  placeholder={currentQuestion.placeholder}
+                  value={answers[currentQuestion.id] || ''}
+                  className="w-full border-2 border-gray-50 rounded-xl p-5 focus:outline-none focus:border-[#1f3a8a] transition-colors resize-none text-lg shadow-sm"
+                  onChange={(e) => handleChange(currentQuestion.id, e.target.value)}
                 ></textarea>
               )}
             </div>
-          ))}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#1f3a8a] text-white py-5 rounded-md font-bold text-lg hover:bg-blue-900 transition-all shadow-lg active:scale-[0.98] disabled:bg-gray-400"
-          >
-            {loading ? 'Analiz Ediliyor...' : 'Analizi Tamamla ve Raporu Hazırla'}
-          </button>
-        </form>
+            <div className="flex gap-4 pt-6">
+              {step > 0 && (
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="flex-1 py-5 border-2 border-gray-100 rounded-xl font-bold uppercase tracking-widest text-xs text-gray-400 hover:bg-gray-50 transition-all"
+                >
+                  Geri Dön
+                </button>
+              )}
 
-        <footer className="text-center pt-8 border-t border-gray-50">
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-            Profesyonel Değerlendirme & Veri Gizliliği Güvencesi
+              {isLastStep ? (
+                <button
+                  type="submit"
+                  disabled={loading || !canContinue}
+                  className="flex-[2] bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-[0.98] disabled:bg-gray-200"
+                >
+                  {loading ? 'Analiz Ediliyor...' : 'Analizi Tamamla'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={!canContinue}
+                  className="flex-[2] bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-[0.98] disabled:bg-gray-200"
+                >
+                  Sonraki Adım
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        <footer className="text-center pt-12 border-t border-gray-50">
+          <p className="text-[10px] text-gray-300 font-bold uppercase tracking-[0.2em]">
+            Profesyonel Kariyer Algoritması v2.4 — <span className="text-gray-400">Verileriniz SSL ile Korunmaktadır</span>
           </p>
         </footer>
       </div>
