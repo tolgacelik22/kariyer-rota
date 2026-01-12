@@ -30,7 +30,7 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_FROM=${SMTP_FROM}
-      - NEXT_PUBLIC_BASE_URL=https://kariyer.tryset.app
+      - NEXT_PUBLIC_BASE_URL=https://kariyer.magicdigital.org
     depends_on:
       db-web-prod:
         condition: service_healthy
@@ -41,7 +41,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik-net"
-      - "traefik.http.routers.kariyer-web.rule=Host(`kariyer.tryset.app`)"
+      - "traefik.http.routers.kariyer-web.rule=Host(`kariyer.magicdigital.org`)"
       - "traefik.http.routers.kariyer-web.entrypoints=websecure"
       - "traefik.http.routers.kariyer-web.tls=true"
       - "traefik.http.routers.kariyer-web.tls.certresolver=letsencrypt"
