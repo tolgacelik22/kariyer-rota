@@ -1,7 +1,6 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
-import { trackEvent } from '@/lib/tracking';
 import ReportClient from './ReportClient';
 
 async function getContext(searchParams) {
@@ -9,42 +8,45 @@ async function getContext(searchParams) {
     const token = cookieStore.get('auth_token')?.value;
     const surveyId = searchParams.id;
 
-    let user = null;
-    let survey = null;
-    let isPremium = false;
+    if (!surveyId) return { survey: null, isPremium: false };
 
-    // 1. Try to get user from token
+    let isPremium = false;
+    let email = null;
+
+    // 1. Try to get email from JWT token (auth cookie)
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            user = await prisma.user.findUnique({
-                where: { id: decoded.userId },
-                include: { surveyResults: { orderBy: { createdAt: 'desc' }, take: 1 } }
-            });
-            if (user) {
-                isPremium = user.isPremium;
-                survey = user.surveyResults[0];
-            }
-        } catch (err) {
-            console.error('JWT verify failed', err);
+            email = decoded.email;
+        } catch (e) {
+            console.error('JWT verify failed', e);
         }
     }
 
-    // 2. Fallback to surveyId from query if no survey found for user
-    if (!survey && surveyId) {
-        survey = await prisma.surveyResult.findUnique({
-            where: { id: surveyId },
+    // 2. Fetch the Survey Result
+    const survey = await prisma.surveyResult.findUnique({
+        where: { id: surveyId },
+    });
+
+    if (!survey) return { survey: null, isPremium: false };
+
+    // 3. Check if this specific report is unlocked for this email
+    if (email) {
+        const entitlement = await prisma.premiumEntitlement.findUnique({
+            where: {
+                email_reportId: { email, reportId: surveyId }
+            }
         });
+        if (entitlement) isPremium = true;
     }
 
-    return { user, survey, isPremium };
+    return { survey, isPremium };
 }
 
 export default async function ReportPage(props) {
     const searchParams = await props.searchParams;
-    const { user, survey, isPremium } = await getContext(searchParams);
+    const { survey, isPremium } = await getContext(searchParams);
 
-    // If still no survey, we can't show anything
     if (!survey) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-4">
@@ -55,12 +57,7 @@ export default async function ReportPage(props) {
         );
     }
 
-    // Identify viewing if possible
-    if (user) {
-        await trackEvent('report_viewed', { userId: user.id, email: user.email });
-    }
-
     return (
-        <ReportClient user={user} survey={survey} isPremium={isPremium} />
+        <ReportClient survey={survey} isPremium={isPremium} />
     );
 }

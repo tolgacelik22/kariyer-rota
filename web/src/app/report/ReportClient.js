@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
-export default function ReportClient({ user, survey, isPremium: initialPremium }) {
+export default function ReportClient({ survey, isPremium: initialPremium }) {
     const [isPremium, setIsPremium] = useState(initialPremium);
     const [loading, setLoading] = useState(false);
     const [verifyMode, setVerifyMode] = useState(false);
@@ -11,22 +11,23 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
 
     const handleVerifyEmail = async (e) => {
         e.preventDefault();
-        if (!verifyEmail) return;
+        if (!verifyEmail || !survey?.id) return;
         setLoading(true);
         try {
             const res = await fetch('/api/premium/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: verifyEmail.toLowerCase().trim() }),
+                body: JSON.stringify({
+                    email: verifyEmail.toLowerCase().trim(),
+                    reportId: survey.id
+                }),
             });
             const data = await res.json();
             if (res.ok && data.ok) {
                 setIsPremium(true);
                 setVerifyMode(false);
             } else {
-                alert(data.reason === 'not_found'
-                    ? 'Bu e-posta ile bir satın alma bulunamadı. Lütfen Shopier’de kullandığınız e-posta ile tekrar deneyin.'
-                    : 'Doğrulama hatası.');
+                alert(data.error || 'Bu rapor için satın alma bulunamadı. Lütfen ödeme e-postanızı kontrol edin.');
             }
         } catch (err) {
             alert('Sistem hatası.');
@@ -36,15 +37,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
     };
 
     const handlePayClick = () => {
-        fetch('/api/track', {
-            method: 'POST',
-            body: JSON.stringify({
-                name: 'paywall_clicked',
-                userId: user?.id,
-                email: user?.email,
-                properties: { price: 299 }
-            })
-        }).catch(() => { });
+        // Track event
     };
 
     return (
@@ -77,33 +70,11 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                     </div>
                     <div className="space-y-6 text-xl leading-relaxed text-gray-700 font-serif border-l-8 border-gray-50 pl-8">
                         <p>
-                            Mevcut verileriniz, profesyonel kariyerinizde "etkin yetkinlik" aşamasına ulaştığınızı ancak bu yetkinliğin <strong>"{survey?.rawAnswers?.concern || 'fırsat'}"</strong> ekseninde nakde veya statüye dönüştürülmesinde %{100 - (survey?.score || 60)} oranında bir verimlilik kaybı yaşadığınızı göstermektedir.
+                            Mevcut verileriniz, profesyonel kariyerinizde "etkin yetkinlik" aşamasına ulaştığınızı ancak bu yetkinliğin <strong>"{survey?.rawAnswers?.concern || 'fırsat'}"</strong> ekseninde nakde veya statüye dönüştürülmesinde %{100 - (survey?.score || 60)} oranında bir verimlilik kaybı yaşadığınızı göstmektedir.
                         </p>
                         <p>
                             Analizimiz, kariyer yolculuğunuzda en çok zorlandığınız <u>"{survey?.rawAnswers?.difficulty}"</u> konusunun, bireysel performansınızdan ziyade mevcut kurumsal yapınızdaki "stratejik görünürlük" eksikliğinden kaynaklandığını doğrulamaktadır.
                         </p>
-                    </div>
-                </section>
-
-                {/* Section 2: Core Insights */}
-                <section className="space-y-8">
-                    <div className="flex items-center gap-4">
-                        <span className="text-3xl font-black text-gray-200">02</span>
-                        <h2 className="text-2xl font-bold uppercase tracking-widest text-[#1f3a8a]">Öne Çıkan Tespitler</h2>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="p-8 bg-gray-50 rounded-lg space-y-4 border border-gray-100">
-                            <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2 text-sm uppercase">Piyasa Konumlanması</h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                Kıdem seviyeniz ({survey?.rawAnswers?.seniority}) ve tecrübe süreniz ({survey?.rawAnswers?.experience}) dikkate alındığında, benzer rollerdeki lider %20'lik dilimle aranızda belirgin bir "risk toleransı" farkı bulunmaktadır.
-                            </p>
-                        </div>
-                        <div className="p-8 bg-gray-50 rounded-lg space-y-4 border border-gray-100">
-                            <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2 text-sm uppercase">Psikolojik Eşik</h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                                Atılganlık puanınız ({survey?.rawAnswers?.risk_tolerance}/10), müzakere masasında "ilk teklifi yapan taraf" olma konusunda çekinceleriniz olduğunu, bu durumun da potansiyel maaş artışlarını baskıladığını göstermektedir.
-                            </p>
-                        </div>
                     </div>
                 </section>
 
@@ -139,7 +110,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                         <>
                                             <Link
                                                 onClick={handlePayClick}
-                                                href="/api/payment/shopier"
+                                                href={`/api/payment/shopier?rid=${survey?.id}`}
                                                 target="_blank"
                                                 className="block w-full bg-[#1f3a8a] text-white py-5 rounded-lg font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 text-lg"
                                             >
@@ -184,12 +155,6 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                             </div>
                                         </form>
                                     )}
-
-                                    <div className="flex flex-col gap-2 pt-2">
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
-                                            Tek Seferlik Ödeme — Ömür Boyu Erişim
-                                        </p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -205,9 +170,6 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                 <p>
                                     Analiz edilen en büyük stratejik hata: Mevcut probleminizi ({survey?.rawAnswers?.difficulty}) yönetirken reaktif bir tutum sergilemenizdir. Planlı olmayan her talep, masada "zayıf el" (weak hand) pozisyonunuzu pekiştirir.
                                 </p>
-                                <p>
-                                    <strong>Çözüm:</strong> Bir sonraki görüşmede "maaş" yerine "katma değer" üzerinden iletişim kurun. {survey?.rawAnswers?.seniority} seviyesindeki bir uzman için pazar, sadece iş yapışınızı değil, stratejik etkinizi fiyatlandırır.
-                                </p>
                             </div>
                         </section>
 
@@ -220,19 +182,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                 <div className="space-y-4 border-l-4 border-gray-900 pl-8">
                                     <h4 className="font-black text-xs uppercase text-gray-400 tracking-[0.3em]">İlk 30 Gün: Konumlandırma</h4>
                                     <p className="text-lg leading-relaxed text-gray-700">
-                                        Görünürlüğünüzü artıracak KPI dökümünüzü hazırlayın. Üst yönetimle "rutin dışı" bir brief toplantısı talep ederek, şirkete son 90 günde kazandırdığınız net değeri (maliyet tasarrufu, hız veya verimlilik) sayısal olarak sunun.
-                                    </p>
-                                </div>
-                                <div className="space-y-4 border-l-4 border-gray-900 pl-8">
-                                    <h4 className="font-black text-xs uppercase text-gray-400 tracking-[0.3em]">60. Gün: Beklenti Yönetimi</h4>
-                                    <p className="text-lg leading-relaxed text-gray-700">
-                                        Mevcut pazar verilerini ve enflasyonist baskıyı değil, şirket içindeki "yerinizin doldurulamazlığını" vurgulayan bir gelişim görüşmesi yapın. Masaya oturmadan önce piyasadaki 3 benzer rol için mülakat tecrübesi edinin (pazar değerinizi güncelleyin).
-                                    </p>
-                                </div>
-                                <div className="space-y-4 border-l-4 border-[#1f3a8a] pl-8">
-                                    <h4 className="font-black text-xs uppercase text-[#1f3a8a] tracking-[0.3em]">90. Gün: Müzakere ve Karar</h4>
-                                    <p className="text-lg leading-relaxed text-gray-900 font-bold">
-                                        Resmi teklifinizi sunun. "Hayır" cevabına karşılık bir "B planı" (farklı şirket veya ek yan haklar) ile masaya oturun. Şartlar istediğiniz gibi değilse, profesyonel bir geçiş stratejisini devreye sokun.
+                                        Görünürlüğünüzü artıracak KPI dökümünüzü hazırlayın. Üst yönetimle "rutin dışı" bir brief toplantısı talep ederek, şirkete son 90 günde kazandırdığınız net değeri sayısal olarak sunun.
                                     </p>
                                 </div>
                             </div>
@@ -240,7 +190,6 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                     </div>
                 </div>
 
-                {/* Professional Footer */}
                 <footer className="pt-24 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     <p className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.5em]">Kariyer Rota © 2024</p>
                     <div className="flex gap-8 text-[10px] font-bold text-gray-300 uppercase tracking-widest">

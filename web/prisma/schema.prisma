@@ -86,3 +86,23 @@ model Consent {
 
   createdAt       DateTime @default(now())
 }
+
+model PremiumEntitlement {
+  id        String   @id @default(cuid())
+  email     String
+  reportId  String
+  orderId   String?
+  createdAt DateTime @default(now())
+
+  @@unique([email, reportId])
+}
+
+model PendingPurchase {
+  id        String   @id @default(cuid())
+  email     String
+  reportId  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([email])
+}

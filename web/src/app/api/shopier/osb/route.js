@@ -36,7 +36,7 @@ export async function POST(request) {
             return new Response('Invalid payload', { status: 400 });
         }
 
-        const { email, orderid, price, currency, productid, istest } = payload;
+        const { email, orderid, price, currency, productid, istest, customernote } = payload;
         const shopierOrderId = String(orderid);
         const targetEmail = (email || '').toLowerCase().trim();
         const isTestOrder = String(istest) === '1';
@@ -50,7 +50,7 @@ export async function POST(request) {
             return new Response('success', { status: 200, headers: { 'Content-Type': 'text/plain' } });
         }
 
-        // 2. Store Order (Purchases log)
+        // 2. Store Order
         const shopierOrder = await prisma.shopierOrder.create({
             data: {
                 orderId: shopierOrderId,
@@ -59,23 +59,35 @@ export async function POST(request) {
                 currency: currency || 'TRY',
                 productId: String(productid || ''),
                 isTest: isTestOrder,
-                rawJson: payload, // Full payload stored for debug/support
+                rawJson: payload,
             }
         });
 
-        // 3. Unlock Premium if product matches (Simplified: all OSB are premium products for now)
+        // 3. Extract Report ID from customernote if present (Format: "rid:REPORT_ID")
+        let reportId = null;
+        if (customernote && customernote.includes('rid:')) {
+            const match = customernote.match(/rid:([a-zA-Z0-9_\-]+)/);
+            if (match) reportId = match[1];
+        }
+
+        // 4. Fallback: Check PendingPurchase if no rid in note
+        if (!reportId && targetEmail) {
+            const pending = await prisma.pendingPurchase.findFirst({
+                where: {
+                    email: targetEmail,
+                    createdAt: { gte: new Date(Date.now() - 30 * 60 * 1000) } // Last 30 mins
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+            if (pending) reportId = pending.reportId;
+        }
+
+        // 5. Create Entitlement and Unlock User
         if (targetEmail) {
             const user = await prisma.user.upsert({
                 where: { email: targetEmail },
-                update: {
-                    isPremium: true,
-                    premiumActivatedAt: new Date(),
-                },
-                create: {
-                    email: targetEmail,
-                    isPremium: true,
-                    premiumActivatedAt: new Date(),
-                }
+                update: { isPremium: true, premiumActivatedAt: new Date() },
+                create: { email: targetEmail, isPremium: true, premiumActivatedAt: new Date() }
             });
 
             await prisma.shopierOrder.update({
@@ -83,10 +95,18 @@ export async function POST(request) {
                 data: { userId: user.id }
             });
 
+            if (reportId) {
+                await prisma.premiumEntitlement.upsert({
+                    where: { email_reportId: { email: targetEmail, reportId } },
+                    update: { orderId: shopierOrderId },
+                    create: { email: targetEmail, reportId, orderId: shopierOrderId }
+                });
+            }
+
             await trackEvent('premium_purchase_success', {
                 email: targetEmail,
                 userId: user.id,
-                properties: { orderId: shopierOrderId, amount: price }
+                properties: { orderId: shopierOrderId, reportId }
             });
         }
 

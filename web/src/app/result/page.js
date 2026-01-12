@@ -1,24 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function PartialResultPage() {
+function ResultContent() {
     const [verifyMode, setVerifyMode] = useState(false);
     const [email, setEmail] = useState('');
     const [downloading, setDownloading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [surveyId, setSurveyId] = useState(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        const id = localStorage.getItem('survey_id');
-        if (!id) {
+        // Priority 1: rid from query param
+        // Priority 2: survey_id from localStorage
+        const rid = searchParams.get('rid') || localStorage.getItem('survey_id');
+
+        if (!rid) {
             router.push('/');
         } else {
-            setSurveyId(id);
+            setSurveyId(rid);
+            localStorage.setItem('survey_id', rid);
         }
-    }, [router]);
+    }, [searchParams, router]);
 
     const handleDownloadPDF = async () => {
         setDownloading(true);
@@ -47,21 +52,22 @@ export default function PartialResultPage() {
 
     const handleVerifyPremium = async (e) => {
         e.preventDefault();
-        if (!email) return;
+        if (!email || !surveyId) return;
         setLoading(true);
         try {
             const res = await fetch('/api/premium/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.toLowerCase().trim() }),
+                body: JSON.stringify({
+                    email: email.toLowerCase().trim(),
+                    reportId: surveyId
+                }),
             });
             const data = await res.json();
             if (res.ok && data.ok) {
                 router.push(`/report?id=${surveyId}`);
             } else {
-                alert(data.reason === 'not_found'
-                    ? 'Bu e-posta ile bir satın alma bulunamadı. Lütfen Shopier’de kullandığınız e-posta ile tekrar deneyin.'
-                    : 'Doğrulama sırasında bir hata oluştu.');
+                alert(data.error || 'Bu rapor için satın alma bulunamadı. Lütfen ödeme e-postanızı kontrol edin.');
             }
         } catch (err) {
             alert('Sistem hatası.');
@@ -122,7 +128,7 @@ export default function PartialResultPage() {
                             {!verifyMode ? (
                                 <div className="space-y-3 pt-2">
                                     <a
-                                        href="/api/payment/shopier"
+                                        href={`/api/payment/shopier?rid=${surveyId}`}
                                         target="_blank"
                                         className="w-full bg-white text-[#1f3a8a] py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:shadow-lg transition-all text-center block"
                                     >
@@ -203,5 +209,13 @@ export default function PartialResultPage() {
                 </footer>
             </div>
         </div>
+    );
+}
+
+export default function PartialResultPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Yükleniyor...</div>}>
+            <ResultContent />
+        </Suspense>
     );
 }
