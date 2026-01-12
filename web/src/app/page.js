@@ -125,6 +125,7 @@ function QuizContent() {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('survey_id', data.id);
+        localStorage.setItem('last_answers', JSON.stringify(answers));
 
         // Track Quiz Completed
         fetch('/api/track', {

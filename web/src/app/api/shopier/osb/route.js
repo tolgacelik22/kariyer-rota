@@ -85,7 +85,8 @@ export async function POST(request) {
         });
 
         // 6. Premium Unlock Logic
-        if (!isTestOrder && targetEmail) {
+        if (targetEmail) {
+            // In recruitment/dev phase, we allow isTestOrder to unlock for testing
             const PREMIUM_PRODUCT_IDS = (process.env.SHOPIER_PREMIUM_PRODUCT_IDS || '').split(',');
 
             // Check if productid matches OR if it's in the productlist

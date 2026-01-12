@@ -10,7 +10,7 @@ export async function GET(request) {
     const rawToken = searchParams.get('token');
 
     if (!rawToken) {
-        return NextResponse.redirect(new URL('/?error=missing_token', request.url));
+        return NextResponse.redirect(new URL('/?error=missing_token', process.env.NEXT_PUBLIC_BASE_URL));
     }
 
     try {
@@ -23,7 +23,7 @@ export async function GET(request) {
 
         if (!tokenRecord || tokenRecord.usedAt || tokenRecord.expiresAt < new Date()) {
             console.warn(`Invalid or expired token attempt: ${rawToken}`);
-            return NextResponse.redirect(new URL('/?error=invalid_token', request.url));
+            return NextResponse.redirect(new URL('/?error=invalid_token', process.env.NEXT_PUBLIC_BASE_URL));
         }
 
         // Mark token as used
@@ -54,9 +54,9 @@ export async function GET(request) {
             email: tokenRecord.user.email
         });
 
-        return NextResponse.redirect(new URL('/report', request.url));
+        return NextResponse.redirect(new URL('/report', process.env.NEXT_PUBLIC_BASE_URL));
     } catch (err) {
         console.error('Token verification failed:', err);
-        return NextResponse.redirect(new URL('/?error=system_error', request.url));
+        return NextResponse.redirect(new URL('/?error=system_error', process.env.NEXT_PUBLIC_BASE_URL));
     }
 }

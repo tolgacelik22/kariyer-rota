@@ -7,6 +7,27 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
     const [isPremium, setIsPremium] = useState(initialPremium);
     const [verifying, setVerifying] = useState(false);
     const [pollTimeout, setPollTimeout] = useState(false);
+    const [verifyMode, setVerifyMode] = useState(false);
+    const [verifyEmail, setVerifyEmail] = useState('');
+
+    const handleVerifyEmail = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch('/api/premium/verify-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: verifyEmail }),
+            });
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                const data = await res.json();
+                alert(data.error);
+            }
+        } catch (err) {
+            alert('Sistem hatası.');
+        }
+    };
 
     useEffect(() => {
         if (isPremium) return;
@@ -146,13 +167,41 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                             Ödemeniz doğrulanıyor, lütfen bekleyin...
                                         </div>
                                     ) : (
-                                        <Link
-                                            onClick={handlePayClick}
-                                            href={`/api/payment/shopier?userId=${user?.id}`}
-                                            className="block w-full bg-[#1f3a8a] text-white py-5 rounded-lg font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 text-lg"
-                                        >
-                                            Tamamını Aç (₺299)
-                                        </Link>
+                                        <>
+                                            <Link
+                                                onClick={handlePayClick}
+                                                href={`/api/payment/shopier?userId=${user?.id}`}
+                                                className="block w-full bg-[#1f3a8a] text-white py-5 rounded-lg font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 text-lg"
+                                            >
+                                                Tamamını Aç (₺299)
+                                            </Link>
+
+                                            <button
+                                                onClick={() => setVerifyMode(true)}
+                                                className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-[#1f3a8a] py-2"
+                                            >
+                                                Zaten satın aldınız mı?
+                                            </button>
+
+                                            {verifyMode && (
+                                                <form onSubmit={handleVerifyEmail} className="bg-gray-50 p-4 rounded-xl space-y-3 border border-gray-100 mt-2">
+                                                    <input
+                                                        type="email"
+                                                        required
+                                                        placeholder="Satın aldığınız e-posta"
+                                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#1f3a8a]"
+                                                        value={verifyEmail}
+                                                        onChange={(e) => setVerifyEmail(e.target.value)}
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        className="w-full bg-gray-900 text-white py-3 rounded-lg text-xs font-bold uppercase tracking-widest"
+                                                    >
+                                                        Raporu Aç
+                                                    </button>
+                                                </form>
+                                            )}
+                                        </>
                                     )}
 
                                     <div className="flex flex-col gap-2 pt-2">

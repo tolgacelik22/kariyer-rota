@@ -35,6 +35,7 @@ services:
       - SHOPIER_OSB_PASS=${SHOPIER_OSB_PASS}
       - SHOPIER_PREMIUM_PRODUCT_IDS=${SHOPIER_PREMIUM_PRODUCT_IDS}
       - NEXT_PUBLIC_BASE_URL=https://kariyer.magicdigital.org
+      - NEXT_PUBLIC_SHOPIER_URL=${SHOPIER_PREMIUM_URL}
       - HOSTNAME=0.0.0.0
     depends_on:
       db-web-prod:
