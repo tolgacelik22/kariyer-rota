@@ -45,6 +45,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # IMPORTANT: Ensure prisma directory is in the root for CLI tools
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/pdfkit/js/data ./node_modules/pdfkit/js/data
 
 USER nextjs
 
