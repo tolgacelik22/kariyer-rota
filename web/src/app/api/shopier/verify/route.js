@@ -29,8 +29,7 @@ export async function GET(request) {
         const pendingPaidOrder = await prisma.shopierOrder.findFirst({
             where: {
                 email: user.email,
-                status: 'paid',
-                // We only link if it hasn't been processed for another user (same email check handles bulk)
+                // In this system, existence in ShopierOrder usually means paid via OSB
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -62,6 +61,49 @@ export async function GET(request) {
         return NextResponse.json({ isPremium: false });
     } catch (err) {
         console.error('Verify endpoint error:', err);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+export async function POST(request) {
+    try {
+        const { orderid } = await request.json();
+
+        if (!orderid) {
+            return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
+        }
+
+        const shopierOrderId = String(orderid);
+
+        // 1. Check if order exists in DB (populated by OSB)
+        const order = await prisma.shopierOrder.findUnique({
+            where: { orderId: shopierOrderId },
+            include: { user: true }
+        });
+
+        if (order) {
+            // If order exists, it means payment was successful (OSB fired)
+            // Ensure user is premium
+            if (order.user && !order.user.isPremium) {
+                await prisma.user.update({
+                    where: { id: order.user.id },
+                    data: {
+                        isPremium: true,
+                        premiumActivatedAt: new Date(),
+                    }
+                });
+            }
+            return NextResponse.json({ success: true, isPremium: true });
+        }
+
+        // 2. If not found, it means OSB might be delayed.
+        return NextResponse.json({
+            success: false,
+            error: 'Siparişiniz henüz işleniyor olabilir. Lütfen 30 saniye sonra tekrar deneyin.'
+        }, { status: 404 });
+
+    } catch (err) {
+        console.error('Verify POST error:', err);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
