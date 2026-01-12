@@ -31,29 +31,24 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid(1001) nodejs
+RUN adduser --system --uid(1001) nextjs
 
-# Copy public folder
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
+# Set correct permissions
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
+# Copy standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# IMPORTANT: Copy prisma directory to allow runtime migrations/push
-# Next.js standalone puts the app in ./server.js but we need schema for CLI
+# IMPORTANT: Ensure prisma directory is in the root for CLI tools
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 USER nextjs
 
 EXPOSE 3000
-
 ENV PORT 3000
 
-# server.js is created by next build from the standalone output
 CMD ["node", "server.js"]
