@@ -48,7 +48,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                 name: 'paywall_clicked',
                 userId: user.id,
                 email: user.email,
-                properties: { price: 499 }
+                properties: { price: 299 }
             })
         }).catch(() => { });
     };
@@ -98,14 +98,14 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                         <h2 className="text-2xl font-bold uppercase tracking-widest text-[#1f3a8a]">Öne Çıkan Tespitler</h2>
                     </div>
                     <div className="grid md:grid-cols-2 gap-8">
-                        <div className="p-8 bg-gray-50 rounded-lg space-y-4">
-                            <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2">Piyasa Konumlanması</h3>
+                        <div className="p-8 bg-gray-50 rounded-lg space-y-4 border border-gray-100">
+                            <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2 text-sm uppercase">Piyasa Konumlanması</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
                                 Kıdem seviyeniz ({survey?.rawAnswers?.seniority}) ve tecrübe süreniz ({survey?.rawAnswers?.experience}) dikkate alındığında, benzer rollerdeki lider %20'lik dilimle aranızda belirgin bir "risk toleransı" farkı bulunmaktadır.
                             </p>
                         </div>
-                        <div className="p-8 bg-gray-50 rounded-lg space-y-4">
-                            <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2">Psikolojik Eşik</h3>
+                        <div className="p-8 bg-gray-50 rounded-lg space-y-4 border border-gray-100">
+                            <h3 className="font-bold text-gray-900 border-b border-gray-200 pb-2 text-sm uppercase">Psikolojik Eşik</h3>
                             <p className="text-sm text-gray-600 leading-relaxed">
                                 Atılganlık puanınız ({survey?.rawAnswers?.risk_tolerance}/10), müzakere masasında "ilk teklifi yapan taraf" olma konusunda çekinceleriniz olduğunu, bu durumun da potansiyel maaş artışlarını baskıladığını göstermektedir.
                             </p>
@@ -117,49 +117,45 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                 <div className="relative">
                     {!isPremium && (
                         <div className="absolute inset-x-0 -top-10 bottom-0 z-20 flex flex-col items-center justify-start pt-32 px-6">
-                            <div className="sticky top-40 w-full max-w-lg bg-white p-10 border-4 border-[#1f3a8a] shadow-[0_20px_50px_rgba(31,58,138,0.3)] space-y-8 text-center rounded-xl animate-in zoom-in duration-300">
-                                <div className="space-y-3">
-                                    <h3 className="text-3xl font-black uppercase tracking-tight text-gray-900">Raporun Tamamını Açın</h3>
+                            <div className="sticky top-40 w-full max-w-lg bg-white p-10 border-4 border-[#1f3a8a] shadow-[0_30px_60px_rgba(31,58,138,0.35)] space-y-8 text-center rounded-2xl animate-in zoom-in duration-300">
+                                <div className="space-y-2">
+                                    <h3 className="text-3xl font-black uppercase tracking-tight text-gray-900">Premium ile Tamamını Aç</h3>
                                     <p className="text-gray-500 text-sm font-medium">
-                                        Kariyerinizdeki engelleri kaldırmak için gereken 3 kritik bölüm henüz kilitli.
+                                        Kariyer stratejinizin kritik final bölümleri kilitli.
                                     </p>
                                 </div>
 
                                 <div className="space-y-4 text-left border-y border-gray-100 py-6">
-                                    <div className="flex items-center gap-3 text-sm text-gray-600 font-medium leading-relaxed">
-                                        <span className="text-[#1f3a8a] font-black">✓</span>
-                                        <span><strong>90 günlük aksiyon planı:</strong> Ay ay ne yapmalısınız?</span>
+                                    <div className="flex items-center gap-3 text-sm text-gray-700 font-bold leading-relaxed">
+                                        <span className="text-[#1f3a8a]">✓</span>
+                                        <span>Yanlış Yapılan Kritik Noktalar</span>
                                     </div>
-                                    <div className="flex items-center gap-3 text-sm text-gray-600 font-medium leading-relaxed">
-                                        <span className="text-[#1f3a8a] font-black">✓</span>
-                                        <span><strong>Müzakere Stratejisi:</strong> Kullanmanız gereken tam cümle örnekleri.</span>
+                                    <div className="flex items-center gap-3 text-sm text-gray-700 font-bold leading-relaxed">
+                                        <span className="text-[#1f3a8a]">✓</span>
+                                        <span>Üst Yönetimle Konuşma Stratejisi</span>
                                     </div>
-                                    <div className="flex items-center gap-3 text-sm text-gray-600 font-medium leading-relaxed">
-                                        <span className="text-[#1f3a8a] font-black">✓</span>
-                                        <span><strong>Hata Analizi:</strong> Mevcut yaklaşımınızda kaçınmanız gerekenler.</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-sm text-gray-600 font-medium leading-relaxed">
-                                        <span className="text-[#1f3a8a] font-black">✓</span>
-                                        <span><strong>Hazırlık Checklist:</strong> Görüşme öncesi kontrol listesi.</span>
+                                    <div className="flex items-center gap-3 text-sm text-gray-700 font-bold leading-relaxed">
+                                        <span className="text-[#1f3a8a]">✓</span>
+                                        <span>90 Günlük Net Aksiyon Planı</span>
                                     </div>
                                 </div>
 
                                 <div className="space-y-4">
                                     {verifying ? (
-                                        <div className="p-4 bg-blue-50 text-[#1f3a8a] rounded-md animate-pulse font-bold">
+                                        <div className="p-4 bg-blue-50 text-[#1f3a8a] rounded-lg animate-pulse font-bold border-2 border-[#1f3a8a]/20">
                                             Ödemeniz doğrulanıyor, lütfen bekleyin...
                                         </div>
                                     ) : (
                                         <Link
                                             onClick={handlePayClick}
                                             href={`/api/payment/shopier?userId=${user?.id}`}
-                                            className="block w-full bg-[#1f3a8a] text-white py-5 rounded-md font-black uppercase tracking-widest hover:bg-blue-900 transition-all shadow-xl active:scale-95 text-lg"
+                                            className="block w-full bg-[#1f3a8a] text-white py-5 rounded-lg font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 text-lg"
                                         >
-                                            Tüm Analizi Aç (₺499)
+                                            Tamamını Aç (₺299)
                                         </Link>
                                     )}
 
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-2 pt-2">
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
                                             Tek Seferlik Ödeme — Ömür Boyu Erişim
                                         </p>
@@ -181,37 +177,30 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                         </div>
                     )}
 
-                    <div className={`space-y-20 ${!isPremium ? 'blur-[10px] select-none pointer-events-none' : ''}`}>
-                        {/* Section 3: Detailed Risks */}
+                    <div className={`space-y-24 ${!isPremium ? 'blur-[10px] select-none pointer-events-none' : ''}`}>
+                        {/* Section 03 & 04 from original structure */}
                         <section className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <span className="text-3xl font-black text-gray-200">03</span>
-                                <h2 className="text-2xl font-bold uppercase tracking-widest text-red-800">Yanlış Yapılan Noktalar</h2>
+                                <h2 className="text-2xl font-bold uppercase tracking-widest text-red-900/60 transition-colors">Yanlış Yapılan Noktalar</h2>
                             </div>
-                            <div className="space-y-6 text-gray-700 leading-relaxed font-serif text-lg">
+                            <div className="p-10 bg-red-50/50 border-l-4 border-red-900/10 space-y-6 text-lg text-gray-800 leading-relaxed font-serif">
                                 <p>
-                                    Analiz edilen en büyük hata: Mevcut probleminizi ({survey?.rawAnswers?.difficulty}) çözerken reaktif (tepki veren) bir tutum sergilemenizdir. Proaktif bir plan olmaksızın atılan her adım, üzerinizdeki "vazgeçilebilir personel" algısını güçlendiriyor.
+                                    Analiz edilen en büyük stratejik hata: Mevcut probleminizi ({survey?.rawAnswers?.difficulty}) yönetirken reaktif bir tutum sergilemenizdir. Planlı olmayan her talep, masada "zayıf el" (weak hand) pozisyonunuzu pekiştirir.
                                 </p>
                             </div>
                         </section>
 
-                        {/* Section 4: Action Plan */}
                         <section className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <span className="text-3xl font-black text-gray-200">04</span>
-                                <h2 className="text-2xl font-bold uppercase tracking-widest text-[#1f3a8a]">Önerilen Aksiyon Planı</h2>
+                                <h2 className="text-2xl font-bold uppercase tracking-widest text-[#1f3a8a]">90 Günlük Aksiyon Planı</h2>
                             </div>
-                            <div className="space-y-10">
+                            <div className="space-y-12">
                                 <div className="space-y-4">
-                                    <h4 className="font-black text-sm uppercase text-gray-400 tracking-widest">İlk 30 Gün: Konumlandırma</h4>
-                                    <p className="text-lg bg-gray-50 p-6 border-l-4 border-gray-900 leading-relaxed">
-                                        Yöneticinizle yapacağınız bir sonraki görüşmede maaş konusunu değil, "verdiğiniz katma değerin ölçümlenmesini" açın. Bu, karşı tarafa güven veren profesyonel bir tuzaktır.
-                                    </p>
-                                </div>
-                                <div className="space-y-4">
-                                    <h4 className="font-black text-sm uppercase text-gray-400 tracking-widest">Sonraki 60 Gün: Müzakere</h4>
-                                    <p className="text-lg bg-gray-50 p-6 border-l-4 border-gray-900 leading-relaxed">
-                                        Belirlediğiniz KPI değerlerini 2 ay boyunca dökümante edin. 60. günün sonunda bu verilerle masaya oturarak "benim değerim bu, piyasa karşılığı bu" diyebilecek somut kanıta sahip olacaksınız.
+                                    <h4 className="font-black text-xs uppercase text-gray-400 tracking-[0.3em]">İlk 30 Gün: Konumlandırma</h4>
+                                    <p className="text-lg bg-gray-50 p-8 border-l-4 border-gray-900 leading-relaxed shadow-sm">
+                                        Yöneticinizle yapacağınız ilk görüşmede maaş değil, "yetkinlik kanıtı" dilini kullanın. Finansal beklenti yerine katılan değerin dökümü üzerinden konuşmak, psikolojik baskıyı yönetimin üzerine yıkar.
                                     </p>
                                 </div>
                             </div>
