@@ -5,70 +5,43 @@ import Link from 'next/link';
 
 export default function ReportClient({ user, survey, isPremium: initialPremium }) {
     const [isPremium, setIsPremium] = useState(initialPremium);
-    const [verifying, setVerifying] = useState(false);
-    const [pollTimeout, setPollTimeout] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [verifyMode, setVerifyMode] = useState(false);
     const [verifyEmail, setVerifyEmail] = useState('');
 
     const handleVerifyEmail = async (e) => {
         e.preventDefault();
+        if (!verifyEmail) return;
+        setLoading(true);
         try {
-            const res = await fetch('/api/premium/verify-email', {
+            const res = await fetch('/api/premium/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: verifyEmail }),
+                body: JSON.stringify({ email: verifyEmail.toLowerCase().trim() }),
             });
-            if (res.ok) {
-                window.location.reload();
+            const data = await res.json();
+            if (res.ok && data.ok) {
+                setIsPremium(true);
+                setVerifyMode(false);
             } else {
-                const data = await res.json();
-                alert(data.error);
+                alert(data.reason === 'not_found'
+                    ? 'Bu e-posta ile bir satın alma bulunamadı. Lütfen Shopier’de kullandığınız e-posta ile tekrar deneyin.'
+                    : 'Doğrulama hatası.');
             }
         } catch (err) {
             alert('Sistem hatası.');
+        } finally {
+            setLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (isPremium) return;
-
-        let interval;
-        const checkPremium = async () => {
-            try {
-                const res = await fetch('/api/shopier/verify');
-                const data = await res.json();
-                if (data.isPremium) {
-                    setIsPremium(true);
-                    setVerifying(false);
-                    clearInterval(interval);
-                }
-            } catch (e) { }
-        };
-
-        // Check after return from payment
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('check') === 'true') {
-            setVerifying(true);
-            interval = setInterval(checkPremium, 3000);
-
-            // Timeout after 120s (2 minutes)
-            setTimeout(() => {
-                clearInterval(interval);
-                setVerifying(false);
-                setPollTimeout(true);
-            }, 120000);
-        }
-
-        return () => clearInterval(interval);
-    }, [isPremium]);
 
     const handlePayClick = () => {
         fetch('/api/track', {
             method: 'POST',
             body: JSON.stringify({
                 name: 'paywall_clicked',
-                userId: user.id,
-                email: user.email,
+                userId: user?.id,
+                email: user?.email,
                 properties: { price: 299 }
             })
         }).catch(() => { });
@@ -88,7 +61,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                         </p>
                     </div>
                     <div className="text-left md:text-right font-mono text-xs text-gray-400 border-l md:border-l-0 md:border-r border-gray-100 pl-4 md:pl-0 md:pr-4">
-                        <p>ID: {user?.id?.slice(0, 12)}</p>
+                        <p>ID: {survey?.id?.slice(0, 12)}</p>
                         <p>Tarih: {new Date(survey?.createdAt || Date.now()).toLocaleDateString('tr-TR')}</p>
                         <p className="mt-2 text-[#1f3a8a] font-bold uppercase tracking-widest leading-relaxed">
                             {isPremium ? 'Sürüm: Full Enterprise' : 'Sürüm: Standard (Kısıtlı)'}
@@ -96,7 +69,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                     </div>
                 </div>
 
-                {/* Section 1: Executive Summary (ALWAYS VISIBLE) */}
+                {/* Section 1: Executive Summary */}
                 <section className="space-y-8">
                     <div className="flex items-center gap-4">
                         <span className="text-3xl font-black text-gray-200">01</span>
@@ -112,7 +85,7 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                     </div>
                 </section>
 
-                {/* Section 2: Core Insights (ALWAYS VISIBLE - ~40% mark) */}
+                {/* Section 2: Core Insights */}
                 <section className="space-y-8">
                     <div className="flex items-center gap-4">
                         <span className="text-3xl font-black text-gray-200">02</span>
@@ -162,15 +135,12 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                 </div>
 
                                 <div className="space-y-4">
-                                    {verifying ? (
-                                        <div className="p-4 bg-blue-50 text-[#1f3a8a] rounded-lg animate-pulse font-bold border-2 border-[#1f3a8a]/20">
-                                            Ödemeniz doğrulanıyor, lütfen bekleyin...
-                                        </div>
-                                    ) : (
+                                    {!verifyMode ? (
                                         <>
                                             <Link
                                                 onClick={handlePayClick}
-                                                href={`/api/payment/shopier?userId=${user?.id}`}
+                                                href="/api/payment/shopier"
+                                                target="_blank"
                                                 className="block w-full bg-[#1f3a8a] text-white py-5 rounded-lg font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95 text-lg"
                                             >
                                                 Tamamını Aç (₺299)
@@ -180,46 +150,45 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                                 onClick={() => setVerifyMode(true)}
                                                 className="text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-[#1f3a8a] py-2"
                                             >
-                                                Zaten satın aldınız mı?
+                                                Satın Aldım, Premium'u Aç
                                             </button>
-
-                                            {verifyMode && (
-                                                <form onSubmit={handleVerifyEmail} className="bg-gray-50 p-4 rounded-xl space-y-3 border border-gray-100 mt-2">
-                                                    <input
-                                                        type="email"
-                                                        required
-                                                        placeholder="Satın aldığınız e-posta"
-                                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#1f3a8a]"
-                                                        value={verifyEmail}
-                                                        onChange={(e) => setVerifyEmail(e.target.value)}
-                                                    />
-                                                    <button
-                                                        type="submit"
-                                                        className="w-full bg-gray-900 text-white py-3 rounded-lg text-xs font-bold uppercase tracking-widest"
-                                                    >
-                                                        Raporu Aç
-                                                    </button>
-                                                </form>
-                                            )}
                                         </>
+                                    ) : (
+                                        <form onSubmit={handleVerifyEmail} className="bg-gray-50 p-6 rounded-xl space-y-4 border border-gray-100 mt-2 animate-in fade-in zoom-in duration-200">
+                                            <div className="space-y-1 text-left">
+                                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Ödeme E-postası</label>
+                                                <input
+                                                    type="email"
+                                                    required
+                                                    placeholder="Shopier'de kullandığınız e-posta"
+                                                    className="w-full px-4 py-4 rounded-xl border-2 border-transparent focus:border-[#1f3a8a] outline-none text-sm transition-all"
+                                                    value={verifyEmail}
+                                                    onChange={(e) => setVerifyEmail(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setVerifyMode(false)}
+                                                    className="bg-gray-200 text-gray-600 py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-300 transition-all"
+                                                >
+                                                    İptal
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    disabled={loading}
+                                                    className="bg-[#1f3a8a] text-white py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:shadow-lg transition-all disabled:opacity-50"
+                                                >
+                                                    {loading ? 'Kontrol Ediliyor...' : 'Doğrula'}
+                                                </button>
+                                            </div>
+                                        </form>
                                     )}
 
                                     <div className="flex flex-col gap-2 pt-2">
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
                                             Tek Seferlik Ödeme — Ömür Boyu Erişim
                                         </p>
-                                        {(verifying || pollTimeout) && (
-                                            <div className="space-y-2">
-                                                {pollTimeout && (
-                                                    <p className="text-xs text-red-600 font-bold">
-                                                        Ödeme onayı gecikti. Satın aldıysanız lütfen sayfayı yenileyin.
-                                                    </p>
-                                                )}
-                                                <a href="mailto:support@magicdigital.org" className="text-[10px] text-[#1f3a8a] underline font-bold uppercase tracking-widest">
-                                                    Sorun mu var? Destek Alın
-                                                </a>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -227,15 +196,17 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                     )}
 
                     <div className={`space-y-24 ${!isPremium ? 'blur-[10px] select-none pointer-events-none' : ''}`}>
-                        {/* Section 03 & 04 from original structure */}
                         <section className="space-y-8">
                             <div className="flex items-center gap-4">
                                 <span className="text-3xl font-black text-gray-200">03</span>
-                                <h2 className="text-2xl font-bold uppercase tracking-widest text-red-900/60 transition-colors">Yanlış Yapılan Noktalar</h2>
+                                <h2 className="text-2xl font-bold uppercase tracking-widest text-red-900 transition-colors">Yanlış Yapılan Noktalar</h2>
                             </div>
-                            <div className="p-10 bg-red-50/50 border-l-4 border-red-900/10 space-y-6 text-lg text-gray-800 leading-relaxed font-serif">
+                            <div className="p-10 bg-red-50 border-l-8 border-red-900 space-y-6 text-lg text-gray-800 leading-relaxed font-serif">
                                 <p>
                                     Analiz edilen en büyük stratejik hata: Mevcut probleminizi ({survey?.rawAnswers?.difficulty}) yönetirken reaktif bir tutum sergilemenizdir. Planlı olmayan her talep, masada "zayıf el" (weak hand) pozisyonunuzu pekiştirir.
+                                </p>
+                                <p>
+                                    <strong>Çözüm:</strong> Bir sonraki görüşmede "maaş" yerine "katma değer" üzerinden iletişim kurun. {survey?.rawAnswers?.seniority} seviyesindeki bir uzman için pazar, sadece iş yapışınızı değil, stratejik etkinizi fiyatlandırır.
                                 </p>
                             </div>
                         </section>
@@ -245,11 +216,23 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                                 <span className="text-3xl font-black text-gray-200">04</span>
                                 <h2 className="text-2xl font-bold uppercase tracking-widest text-[#1f3a8a]">90 Günlük Aksiyon Planı</h2>
                             </div>
-                            <div className="space-y-12">
-                                <div className="space-y-4">
+                            <div className="grid gap-12">
+                                <div className="space-y-4 border-l-4 border-gray-900 pl-8">
                                     <h4 className="font-black text-xs uppercase text-gray-400 tracking-[0.3em]">İlk 30 Gün: Konumlandırma</h4>
-                                    <p className="text-lg bg-gray-50 p-8 border-l-4 border-gray-900 leading-relaxed shadow-sm">
-                                        Yöneticinizle yapacağınız ilk görüşmede maaş değil, "yetkinlik kanıtı" dilini kullanın. Finansal beklenti yerine katılan değerin dökümü üzerinden konuşmak, psikolojik baskıyı yönetimin üzerine yıkar.
+                                    <p className="text-lg leading-relaxed text-gray-700">
+                                        Görünürlüğünüzü artıracak KPI dökümünüzü hazırlayın. Üst yönetimle "rutin dışı" bir brief toplantısı talep ederek, şirkete son 90 günde kazandırdığınız net değeri (maliyet tasarrufu, hız veya verimlilik) sayısal olarak sunun.
+                                    </p>
+                                </div>
+                                <div className="space-y-4 border-l-4 border-gray-900 pl-8">
+                                    <h4 className="font-black text-xs uppercase text-gray-400 tracking-[0.3em]">60. Gün: Beklenti Yönetimi</h4>
+                                    <p className="text-lg leading-relaxed text-gray-700">
+                                        Mevcut pazar verilerini ve enflasyonist baskıyı değil, şirket içindeki "yerinizin doldurulamazlığını" vurgulayan bir gelişim görüşmesi yapın. Masaya oturmadan önce piyasadaki 3 benzer rol için mülakat tecrübesi edinin (pazar değerinizi güncelleyin).
+                                    </p>
+                                </div>
+                                <div className="space-y-4 border-l-4 border-[#1f3a8a] pl-8">
+                                    <h4 className="font-black text-xs uppercase text-[#1f3a8a] tracking-[0.3em]">90. Gün: Müzakere ve Karar</h4>
+                                    <p className="text-lg leading-relaxed text-gray-900 font-bold">
+                                        Resmi teklifinizi sunun. "Hayır" cevabına karşılık bir "B planı" (farklı şirket veya ek yan haklar) ile masaya oturun. Şartlar istediğiniz gibi değilse, profesyonel bir geçiş stratejisini devreye sokun.
                                     </p>
                                 </div>
                             </div>
@@ -261,8 +244,8 @@ export default function ReportClient({ user, survey, isPremium: initialPremium }
                 <footer className="pt-24 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     <p className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.5em]">Kariyer Rota © 2024</p>
                     <div className="flex gap-8 text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-                        <span>Gizlilik Politikası</span>
-                        <span>Kullanım Koşulları</span>
+                        <span>KVKK Uyumlu</span>
+                        <span>Stratejik Karar Destek</span>
                     </div>
                 </footer>
             </div>

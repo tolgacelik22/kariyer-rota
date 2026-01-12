@@ -160,6 +160,12 @@ function QuizContent() {
     <main className="min-h-screen bg-white py-12 px-6 text-gray-800 font-sans flex flex-col items-center">
       <div className="max-w-xl w-full space-y-12">
         <header className="space-y-6 text-center">
+          <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100/50 text-center animate-in fade-in duration-500">
+            <p className="text-[10px] font-medium text-blue-900/60 leading-relaxed uppercase tracking-widest">
+              Kişisel verileriniz <a href="/kvkk" target="_blank" className="underline font-bold hover:text-blue-900">KVKK Aydınlatma Metni</a> uyarınca güvence altındadır.
+            </p>
+          </div>
+
           <div className="space-y-2">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#1f3a8a]">
               Analiz Süreci: Adım {step + 1} / {QUESTIONS.length}

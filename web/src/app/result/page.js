@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function PartialResultPage() {
     const [verifyMode, setVerifyMode] = useState(false);
-    const [verifyEmail, setVerifyEmail] = useState('');
+    const [email, setEmail] = useState('');
     const [downloading, setDownloading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [surveyId, setSurveyId] = useState(null);
@@ -45,20 +45,23 @@ export default function PartialResultPage() {
         }
     };
 
-    const handleVerifyEmail = async (e) => {
+    const handleVerifyPremium = async (e) => {
         e.preventDefault();
+        if (!email) return;
         setLoading(true);
         try {
-            const res = await fetch('/api/premium/verify-email', {
+            const res = await fetch('/api/premium/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: verifyEmail }),
+                body: JSON.stringify({ email: email.toLowerCase().trim() }),
             });
             const data = await res.json();
-            if (res.ok) {
-                router.push(data.redirect);
+            if (res.ok && data.ok) {
+                router.push(`/report?id=${surveyId}`);
             } else {
-                alert(data.error);
+                alert(data.reason === 'not_found'
+                    ? 'Bu e-posta ile bir satın alma bulunamadı. Lütfen Shopier’de kullandığınız e-posta ile tekrar deneyin.'
+                    : 'Doğrulama sırasında bir hata oluştu.');
             }
         } catch (err) {
             alert('Sistem hatası.');
@@ -103,56 +106,70 @@ export default function PartialResultPage() {
                         <button
                             onClick={handleDownloadPDF}
                             disabled={downloading}
-                            className="w-full bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-95 disabled:bg-gray-300"
+                            className="w-full bg-white border-4 border-gray-100 text-gray-400 py-5 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-all active:scale-95 disabled:bg-gray-50"
                         >
                             {downloading ? 'Hazırlanıyor...' : 'Ön Raporu PDF İndir (Ücretsiz)'}
                         </button>
 
-                        <a
-                            href="/api/payment/shopier"
-                            target="_blank"
-                            className="w-full bg-white border-4 border-[#1f3a8a] text-[#1f3a8a] py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-gray-50 transition-all text-center block"
-                        >
-                            Detaylı Raporu Aç (Premium)
-                        </a>
-                    </div>
+                        <div className="bg-[#1f3a8a] p-8 rounded-2xl shadow-2xl space-y-6">
+                            <h2 className="text-white text-xl font-black tracking-tight leading-tight">
+                                Detaylı Analiz & 90 Günlük Aksiyon Planı
+                            </h2>
+                            <p className="text-blue-100/70 text-sm leading-relaxed">
+                                Hangi hataları yaptığınızı, üst yönetimle nasıl konuşmanız gerektiğini ve adım adım 90 günlük planınızı hemen görün.
+                            </p>
 
-                    {!verifyMode ? (
-                        <button
-                            onClick={() => setVerifyMode(true)}
-                            className="w-full text-[10px] text-gray-400 font-bold uppercase tracking-widest hover:text-[#1f3a8a] transition-colors"
-                        >
-                            Satın aldınız mı? Buradan erişin
-                        </button>
-                    ) : (
-                        <form onSubmit={handleVerifyEmail} className="bg-gray-50 p-6 rounded-xl space-y-4 border border-gray-100">
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Premium Erişimi</p>
-                            <div className="flex gap-2">
-                                <input
-                                    type="email"
-                                    required
-                                    placeholder="Satın aldığınız e-posta"
-                                    className="flex-1 px-4 py-3 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#1f3a8a]"
-                                    value={verifyEmail}
-                                    onChange={(e) => setVerifyEmail(e.target.value)}
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="bg-gray-900 text-white px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black transition-all"
-                                >
-                                    Kontrol Et
-                                </button>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setVerifyMode(false)}
-                                className="text-[10px] text-gray-400 underline"
-                            >
-                                Vazgeç
-                            </button>
-                        </form>
-                    )}
+                            {!verifyMode ? (
+                                <div className="space-y-3 pt-2">
+                                    <a
+                                        href="/api/payment/shopier"
+                                        target="_blank"
+                                        className="w-full bg-white text-[#1f3a8a] py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:shadow-lg transition-all text-center block"
+                                    >
+                                        Detaylı Raporu Aç (₺299)
+                                    </a>
+                                    <button
+                                        onClick={() => setVerifyMode(true)}
+                                        className="w-full text-[10px] text-blue-200/50 font-bold uppercase tracking-widest hover:text-white transition-colors py-2"
+                                    >
+                                        Satın Aldım, Premium'u Aç
+                                    </button>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleVerifyPremium} className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-1">
+                                        <input
+                                            type="email"
+                                            required
+                                            placeholder="Ödeme e-postanızı girin"
+                                            className="w-full px-5 py-4 rounded-xl border-none text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                        <p className="text-[10px] text-blue-200/50 italic px-1">
+                                            * Shopier'de kullandığınız e-posta ile aynı olmalı.
+                                        </p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setVerifyMode(false)}
+                                            className="bg-blue-800 text-white py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all"
+                                        >
+                                            Geri Dön
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="bg-white text-[#1f3a8a] py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:shadow-lg transition-all disabled:opacity-50"
+                                        >
+                                            {loading ? 'Kontrol Ediliyor...' : 'Doğrula ve Aç'}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                    </div>
                 </section>
 
                 <div className="space-y-12 opacity-50 select-none pointer-events-none relative overflow-hidden pt-8">
