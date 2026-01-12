@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const QUESTIONS = [
@@ -53,11 +53,10 @@ const QUESTIONS = [
   },
 ];
 
-export default function LandingQuizPage() {
+function QuizContent() {
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -213,5 +212,17 @@ export default function LandingQuizPage() {
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function LandingQuizPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3a8a]"></div>
+      </div>
+    }>
+      <QuizContent />
+    </Suspense>
   );
 }

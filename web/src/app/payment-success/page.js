@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
     const [status, setStatus] = useState('processing');
     const searchParams = useSearchParams();
     const orderId = searchParams.get('order_id');
@@ -74,5 +74,17 @@ export default function PaymentSuccessPage() {
                 </>
             )}
         </div>
+    );
+}
+
+export default function PaymentSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3a8a]"></div>
+            </div>
+        }>
+            <PaymentSuccessContent />
+        </Suspense>
     );
 }
