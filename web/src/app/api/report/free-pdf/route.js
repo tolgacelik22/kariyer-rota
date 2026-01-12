@@ -1,11 +1,21 @@
 import { NextResponse } from 'next/server';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import path from 'path';
 import fs from 'fs';
 
+// Turkish character mapping for fallback
+const trMap = {
+    'ğ': 'g', 'Ğ': 'G', 'ş': 's', 'Ş': 'S', 'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O', 'ç': 'c', 'Ç': 'C', 'ü': 'u', 'Ü': 'U'
+};
+
+function safeTr(text) {
+    if (!text) return '';
+    return text.toString().replace(/[ğĞşŞıİöÖçÇüÜ]/g, m => trMap[m] || m);
+}
+
 export async function POST(request) {
-    console.log('PDF: Character-safe generation starting');
+    console.log('PDF: Advanced generation starting');
     try {
         let answers = {};
         try {
@@ -18,73 +28,77 @@ export async function POST(request) {
         const pdfDoc = await PDFDocument.create();
         pdfDoc.registerFontkit(fontkit);
 
-        // Load Turkish-supported font (Inter)
-        const fontPath = path.join(process.cwd(), 'public/fonts/Inter-Regular.ttf');
-        if (!fs.existsSync(fontPath)) {
-            throw new Error('Font file not found at ' + fontPath);
+        let font;
+        let fontLoaded = false;
+
+        // Try to load custom font
+        try {
+            const fontPath = path.join(process.cwd(), 'public/fonts/Roboto-Regular.ttf');
+            if (fs.existsSync(fontPath)) {
+                const fontBytes = fs.readFileSync(fontPath);
+                font = await pdfDoc.embedFont(fontBytes);
+                fontLoaded = true;
+                console.log('PDF: Roboto font loaded successfully');
+            }
+        } catch (e) {
+            console.error('PDF: Custom font load failed, falling back to Helvetica', e.message);
         }
 
-        const fontBytes = fs.readFileSync(fontPath);
-        const customFont = await pdfDoc.embedFont(fontBytes);
+        // If custom font failed, use Helvetica (which doesn't support TR chars in PDF-lib)
+        if (!fontLoaded) {
+            font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        }
 
-        const page = pdfDoc.addPage([595.28, 841.89]); // A4
+        const page = pdfDoc.addPage([595.28, 841.89]);
         const { width, height } = page.getSize();
 
-        // Title
-        page.drawText('Kariyer Ön Analiz Raporu', {
-            x: 50,
-            y: height - 80,
-            size: 22,
-            font: customFont,
+        // Helper to draw text with fallback for encoding
+        const drawLine = (text, x, y, size, isBold = false) => {
+            try {
+                page.drawText(fontLoaded ? text : safeTr(text), {
+                    x, y, size, font,
+                    color: rgb(options?.r || 0, options?.g || 0, options?.b || 0)
+                });
+            } catch (err) {
+                // If it still fails (even with custom font), force sanitize
+                page.drawText(safeTr(text), { x, y, size, font });
+            }
+        };
+
+        // Header
+        const title = fontLoaded ? 'Kariyer Ön Analiz Raporu' : 'Kariyer On Analiz Raporu';
+        page.drawText(title, {
+            x: 50, y: height - 80, size: 22, font,
             color: rgb(0.12, 0.23, 0.54),
         });
 
-        const seniority = answers.seniority || 'Belirtilmedi';
         const dateStr = new Date().toLocaleDateString('tr-TR');
+        const seniority = answers.seniority || 'Belirtilmedi';
 
-        page.drawText(`Tarih: ${dateStr}`, { x: 50, y: height - 120, size: 11, font: customFont, color: rgb(0.3, 0.3, 0.3) });
-        page.drawText(`Seviye: ${seniority}`, { x: 50, y: height - 135, size: 11, font: customFont, color: rgb(0.3, 0.3, 0.3) });
+        page.drawText(`Tarih: ${dateStr}`, { x: 50, y: height - 120, size: 11, font });
+        page.drawText(`Seviye: ${fontLoaded ? seniority : safeTr(seniority)}`, { x: 50, y: height - 135, size: 11, font });
 
-        // Section 1
-        page.drawText('1. Temel Tespit', { x: 50, y: height - 180, size: 15, font: customFont, color: rgb(0, 0, 0) });
-        page.drawText('Tecrübe seviyenize oranla sorumluluk ve yetki dengesinin bozulduğu görülmektedir. Bu durum piyasa değerinizi baskılayan bir plato etkisi yaratır.', {
-            x: 50,
-            y: height - 210,
-            size: 10,
-            font: customFont,
-            color: rgb(0.4, 0.4, 0.4),
-            maxWidth: 500,
-            lineHeight: 14,
-        });
+        // Body sections
+        const drawBodySection = (title, content, startY) => {
+            page.drawText(fontLoaded ? title : safeTr(title), { x: 50, y: startY, size: 15, font, color: rgb(0, 0, 0) });
+            page.drawText(fontLoaded ? content : safeTr(content), {
+                x: 50, y: startY - 25, size: 10, font, color: rgb(0.4, 0.4, 0.4),
+                maxWidth: 500, lineHeight: 14
+            });
+        };
 
-        // Section 2
-        page.drawText('2. İletişim Bariyeri', { x: 50, y: height - 260, size: 15, font: customFont, color: rgb(0, 0, 0) });
-        page.drawText('Zorlandığınız konu, genellikle üst yönetimle olan "değer kanıtlama" eksikliğinden gelmektedir. Görünür olmayan başarı, müzakere masasında argüman kaybına neden olur.', {
-            x: 50,
-            y: height - 290,
-            size: 10,
-            font: customFont,
-            color: rgb(0.4, 0.4, 0.4),
-            maxWidth: 500,
-            lineHeight: 14,
-        });
+        drawBodySection('1. Temel Tespit', 'Tecrübe seviyenize oranla sorumluluk ve yetki dengesinin bozulduğu görülmektedir. Bu durum piyasa değerinizi baskılayan bir plato etkisi yaratır.', height - 180);
+        drawBodySection('2. İletişim Bariyeri', 'Zorlandığınız konu, genellikle üst yönetimle olan "değer kanıtlama" eksikliğinden gelmektedir. Görünür olmayan başarı, müzakere masasında argüman kaybına neden olur.', height - 260);
 
         // Premium Box
         const boxY = height - 420;
-        page.drawRectangle({
-            x: 50, y: boxY, width: 500, height: 100,
-            color: rgb(0.98, 0.98, 0.98), borderColor: rgb(0.12, 0.23, 0.54), borderWidth: 1,
-        });
-
-        page.drawText('PREMIUM RAPORDA SİZİ NELER BEKLİYOR?', {
-            x: 70, y: boxY + 70, size: 12, font: customFont, color: rgb(0.12, 0.23, 0.54),
-        });
-
-        page.drawText('• Yanlış Yapılan 5 Kritik Stratejik Hata', { x: 70, y: boxY + 45, size: 9, font: customFont, color: rgb(0.4, 0.4, 0.4) });
-        page.drawText('• 90 Günlük Net Aksiyon Planı', { x: 70, y: boxY + 30, size: 9, font: customFont, color: rgb(0.4, 0.4, 0.4) });
+        page.drawRectangle({ x: 50, y: boxY, width: 500, height: 100, color: rgb(0.98, 0.98, 0.98), borderColor: rgb(0.12, 0.23, 0.54), borderWidth: 1 });
+        page.drawText('PREMIUM RAPORDA SIZI NELER BEKLIYOR?', { x: 70, y: boxY + 70, size: 12, font, color: rgb(0.12, 0.23, 0.54) });
+        page.drawText('- Yanlis Yapilan 5 Kritik Stratejik Hata', { x: 70, y: boxY + 45, size: 9, font });
+        page.drawText('- 90 Gunluk Net Aksiyon Plani', { x: 70, y: boxY + 30, size: 9, font });
 
         const pdfBytes = await pdfDoc.save();
-        console.log('PDF: Generation complete with custom font support');
+        console.log('PDF: Generation complete, fontLoaded:', fontLoaded);
 
         return new NextResponse(pdfBytes, {
             headers: {
@@ -95,7 +109,10 @@ export async function POST(request) {
         });
 
     } catch (err) {
-        console.error('PDF: Encoding/Font error', err);
-        return NextResponse.json({ error: 'Internal Server Error', details: err.message }, { status: 500 });
+        console.error('PDF: Critical failure', err);
+        return NextResponse.json({
+            error: 'Internal Server Error',
+            details: err.message
+        }, { status: 500 });
     }
 }
