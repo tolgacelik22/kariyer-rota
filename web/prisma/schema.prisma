@@ -69,3 +69,20 @@ model Event {
   properties   Json?
   createdAt    DateTime      @default(now())
 }
+
+model Consent {
+  id              String   @id @default(cuid())
+  userId          String?
+  sessionId       String
+  consentType     String   // "kvkk"
+  consentVersion  String
+  textHash        String
+  accepted        Boolean
+  acceptedAt      DateTime @default(now())
+  ip              String?
+  userAgent       String?
+  source          String
+  metadata        Json?
+
+  createdAt       DateTime @default(now())
+}

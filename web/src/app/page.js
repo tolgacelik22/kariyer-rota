@@ -70,6 +70,7 @@ function QuizContent() {
     risk_tolerance: 5 // Default for range
   });
   const [loading, setLoading] = useState(false);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -111,6 +112,7 @@ function QuizContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!kvkkAccepted) return;
     setLoading(true);
 
     const utms = JSON.parse(localStorage.getItem('utms') || '{}');
@@ -119,7 +121,7 @@ function QuizContent() {
       const res = await fetch('/api/survey/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers, utms }),
+        body: JSON.stringify({ answers, utms, kvkkAccepted }),
       });
 
       if (res.ok) {
@@ -134,6 +136,9 @@ function QuizContent() {
         }).catch(() => { });
 
         router.push('/result');
+      } else {
+        const errData = await res.json();
+        alert(errData.error || 'Bir hata oluştu.');
       }
     } catch (err) {
       console.error(err);
@@ -149,6 +154,7 @@ function QuizContent() {
 
   // Simple validation to enable "Next"
   const canContinue = answers[currentQuestion.id] !== undefined && answers[currentQuestion.id] !== '';
+  const canSubmit = canContinue && kvkkAccepted;
 
   return (
     <main className="min-h-screen bg-white py-12 px-6 text-gray-800 font-sans flex flex-col items-center">
@@ -251,35 +257,58 @@ function QuizContent() {
               )}
             </div>
 
-            <div className="flex gap-4 pt-6">
-              {step > 0 && (
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="flex-1 py-5 border-2 border-gray-100 rounded-xl font-bold uppercase tracking-widest text-xs text-gray-400 hover:bg-gray-50 transition-all"
-                >
-                  Geri Dön
-                </button>
+            <div className="flex gap-4 pt-6 flex-col">
+              {isLastStep && (
+                <div className="space-y-4 pb-4">
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      className="mt-1 w-5 h-5 rounded border-gray-200 text-[#1f3a8a] focus:ring-[#1f3a8a] transition-all cursor-pointer"
+                      checked={kvkkAccepted}
+                      onChange={(e) => setKvkkAccepted(e.target.checked)}
+                    />
+                    <span className="text-sm text-gray-500 leading-snug group-hover:text-gray-700 transition-colors">
+                      <a href="/kvkk" target="_blank" className="text-[#1f3a8a] font-bold underline decoration-blue-100 hover:decoration-blue-300">KVKK Aydınlatma Metni</a>’ni okudum ve kişisel verilerimin işlenmesini kabul ediyorum.
+                    </span>
+                  </label>
+                  {!kvkkAccepted && (
+                    <p className="text-[10px] font-bold text-red-400 uppercase tracking-widest animate-pulse">
+                      Devam etmek için onayınız gereklidir.
+                    </p>
+                  )}
+                </div>
               )}
 
-              {isLastStep ? (
-                <button
-                  type="submit"
-                  disabled={loading || !canContinue}
-                  className="flex-[2] bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-[0.98] disabled:bg-gray-200"
-                >
-                  {loading ? 'Analiz Ediliyor...' : 'Analizi Tamamla'}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  disabled={!canContinue}
-                  className="flex-[2] bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-[0.98] disabled:bg-gray-200"
-                >
-                  Sonraki Adım
-                </button>
-              )}
+              <div className="flex gap-4">
+                {step > 0 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="flex-1 py-5 border-2 border-gray-100 rounded-xl font-bold uppercase tracking-widest text-xs text-gray-400 hover:bg-gray-50 transition-all"
+                  >
+                    Geri Dön
+                  </button>
+                )}
+
+                {isLastStep ? (
+                  <button
+                    type="submit"
+                    disabled={loading || !canSubmit}
+                    className="flex-[2] bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-[0.98] disabled:bg-gray-200"
+                  >
+                    {loading ? 'Analiz Ediliyor...' : 'Analizi Tamamla'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    disabled={!canContinue}
+                    className="flex-[2] bg-[#1f3a8a] text-white py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-blue-900 transition-all shadow-xl active:scale-[0.98] disabled:bg-gray-200"
+                  >
+                    Sonraki Adım
+                  </button>
+                )}
+              </div>
             </div>
           </form>
         </div>
