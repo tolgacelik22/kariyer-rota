@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  const refreshUser = async () => {
+  const refreshUser = React.useCallback(async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
       if (userId) {
@@ -33,14 +33,14 @@ export const UserProvider = ({ children }) => {
           categoryProgress: response.data.categoryProgress || {},
         });
         // If reward granted, we could show a toast here, but simpler to let UI handle it
-        return response.data; 
+        return response.data;
       }
     } catch (error) {
       console.error("Error refreshing user:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const updateBalance = (newBalance) => {
     setUser(prev => ({ ...prev, balance: newBalance }));

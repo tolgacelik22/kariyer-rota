@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String         @id @default(cuid())
+  email                String         @unique
+  isPremium            Boolean        @default(false)
+  premiumActivatedAt   DateTime?
+  utmSource            String?
+  utmMedium            String?
+  utmCampaign          String?
+  createdAt            DateTime       @default(now())
+  surveyResults        SurveyResult[]
+  shopierOrders        ShopierOrder[]
+  events               Event[]
+  tokens               Token[]
+}
+
+model SurveyResult {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  rawAnswers  Json
+  score       Int
+  createdAt   DateTime @default(now())
+  events      Event[]
+}
+
+model ShopierOrder {
+  id             String   @id @default(cuid())
+  orderId        String   @unique
+  email          String
+  amount         Float
+  currency       String
+  productId      String?
+  isTest         Boolean  @default(false)
+  rawJson        Json
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Token {
+  id        String    @id @default(cuid())
+  hash      String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  type      String    // magic_link
+  usedAt    DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}
+
+model Event {
+  id           String        @id @default(cuid())
+  name         String
+  email        String?
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id])
+  submissionId String?
+  survey       SurveyResult? @relation(fields: [submissionId], references: [id])
+  properties   Json?
+  createdAt    DateTime      @default(now())
+}

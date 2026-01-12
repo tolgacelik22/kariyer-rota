@@ -8,15 +8,15 @@ const PRODUCTION_API_URL = 'https://kariyer-rota-api.magicdigital.org/api';
 // For Android Emulator, use 10.0.2.2
 // For iOS Simulator, localhost is fine IF running on same machine
 // For physical devices, use your machine's LAN IP address
-const DEV_API_URL = Platform.OS === 'android' 
-  ? 'http://10.0.2.2:4000/api' 
-  : 'http://localhost:4000/api';
+const DEV_API_URL = Platform.OS === 'android'
+  ? 'http://10.0.2.2:4000/api'
+  : 'http://192.168.68.100:4000/api';
 
 // Use environment variable or default to production
 // Set EXPO_PUBLIC_API_URL in .env file to override
 // For development: EXPO_PUBLIC_API_URL=http://localhost:4000/api
 // For production: EXPO_PUBLIC_API_URL=https://kariyer-rota-api.magicdigital.org/api (default)
-const API_URL = process.env.EXPO_PUBLIC_API_URL || PRODUCTION_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL || (__DEV__ ? DEV_API_URL : PRODUCTION_API_URL);
 
 // Log API URL in development
 if (__DEV__) {

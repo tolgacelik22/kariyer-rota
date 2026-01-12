@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db-web:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kariyer_web
+    volumes:
+      - postgres_web_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  web:
+    build: .
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db-web:5432/kariyer_web?schema=public
+      - JWT_SECRET=dev-secret-key
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3001
+    depends_on:
+      - db-web
+
+volumes:
+  postgres_web_data:

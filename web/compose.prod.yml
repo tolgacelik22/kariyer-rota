@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  db-web-prod:
+    image: postgres:15-alpine
+    container_name: kariyer-rota-web-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-kariyer_web}
+    volumes:
+      - kariyer_rota_web_db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kariyer-rota-web-app
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@db-web-prod:5432/${DB_NAME:-kariyer_web}?schema=public
+      - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - NEXT_PUBLIC_BASE_URL=https://kariyer.tryset.app
+    depends_on:
+      db-web-prod:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - traefik-net
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.kariyer-web.rule=Host(`kariyer.tryset.app`)"
+      - "traefik.http.routers.kariyer-web.entrypoints=websecure"
+      - "traefik.http.routers.kariyer-web.tls=true"
+      - "traefik.http.routers.kariyer-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kariyer-web.loadbalancer.server.port=3000"
+
+networks:
+  traefik-net:
+    external: true
+
+volumes:
+  kariyer_rota_web_db_data:
+    driver: local
