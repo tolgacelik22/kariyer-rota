@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import PDFDocument from 'pdfkit';
-import path from 'path';
-import fs from 'fs';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export async function POST(request) {
-    console.log('PDF: Request received');
+    console.log('PDF: Starting generation with pdf-lib');
     try {
         let answers = {};
         try {
@@ -14,66 +12,95 @@ export async function POST(request) {
             console.error('PDF: JSON parse error', e);
         }
 
-        const chunks = [];
-        const doc = new PDFDocument({
-            margin: 50,
-            size: 'A4'
+        // Create a new PDFDocument
+        const pdfDoc = await PDFDocument.create();
+
+        // Standard fonts in pdf-lib do NOT require external files
+        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+        // Add a blank page to the document
+        const page = pdfDoc.addPage([595.28, 841.89]); // A4 size
+        const { width, height } = page.getSize();
+
+        // Draw Title
+        page.drawText('Kariyer On Analiz Raporu', {
+            x: 50,
+            y: height - 80,
+            size: 24,
+            font: helveticaBold,
+            color: rgb(0.12, 0.23, 0.54), // #1f3a8a
         });
 
-        doc.on('data', chunk => chunks.push(chunk));
-
-        const pdfPromise = new Promise((resolve, reject) => {
-            doc.on('end', () => resolve(Buffer.concat(chunks)));
-            doc.on('error', reject);
-        });
-
-        // Safe font loading
-        const fontPath = path.join(process.cwd(), 'public/fonts/Inter-Regular.ttf');
-        if (fs.existsSync(fontPath)) {
-            const fontBuffer = fs.readFileSync(fontPath);
-            try {
-                doc.font(fontBuffer);
-                console.log('PDF: Custom font loaded from buffer');
-            } catch (e) {
-                console.error('PDF: Custom font buffer load failed', e);
-                // Fallback will use Helvetica, which we fixed in Dockerfile
-            }
-        }
-
-        // Content
-        doc.fillColor('#1f3a8a').fontSize(22).text('Kariyer Ön Analiz Raporu', { align: 'center' });
-        doc.moveDown(2);
-
+        // Date & Seniority
+        const dateStr = new Date().toLocaleDateString('tr-TR');
         const seniority = answers.seniority || 'Belirtilmedi';
-        doc.fillColor('#444').fontSize(12).text(`Tarih: ${new Date().toLocaleDateString('tr-TR')}`);
-        doc.text(`Seviye: ${seniority}`);
-        doc.moveDown();
 
-        doc.fillColor('#000').fontSize(16).text('1. Temel Tespit');
-        doc.fillColor('#666').fontSize(11).text('Tecrübe seviyenize oranla sorumluluk ve yetki dengesinin bozulduğu görülmektedir.');
-        doc.moveDown();
+        page.drawText(`Tarih: ${dateStr}`, { x: 50, y: height - 120, size: 12, font: helvetica, color: rgb(0.3, 0.3, 0.3) });
+        page.drawText(`Seviye: ${seniority}`, { x: 50, y: height - 135, size: 12, font: helvetica, color: rgb(0.3, 0.3, 0.3) });
 
-        doc.fillColor('#000').fontSize(16).text('2. İletişim Bariyeri');
-        doc.fillColor('#666').fontSize(11).text('Zorlandığınız konu, genellikle üst yönetimle olan "değer kanıtlama" eksikliğinden gelmektedir.');
-        doc.moveDown(2);
+        // Section 1
+        page.drawText('1. Temel Tespit', { x: 50, y: height - 180, size: 16, font: helveticaBold, color: rgb(0, 0, 0) });
+        page.drawText('Tecrübe seviyenize oranla sorumluluk ve yetki dengesinin bozulduğu görülmektedir.', {
+            x: 50,
+            y: height - 205,
+            size: 11,
+            font: helvetica,
+            color: rgb(0.4, 0.4, 0.4),
+            maxWidth: 500,
+            lineHeight: 14,
+        });
 
-        doc.rect(50, doc.y, 500, 80).fillAndStroke('#f9fafb', '#1f3a8a');
-        doc.fillColor('#1f3a8a').fontSize(12).text('PREMIUM RAPORDA SİZİ NELER BEKLİYOR?', 70, doc.y - 65);
+        // Section 2
+        page.drawText('2. İletişim Bariyeri', { x: 50, y: height - 250, size: 16, font: helveticaBold, color: rgb(0, 0, 0) });
+        page.drawText('Zorlandığınız konu, genellikle üst yönetimle olan "değer kanıtlama" eksikliğinden gelmektedir.', {
+            x: 50,
+            y: height - 275,
+            size: 11,
+            font: helvetica,
+            color: rgb(0.4, 0.4, 0.4),
+            maxWidth: 500,
+            lineHeight: 14,
+        });
 
-        doc.end();
+        // Premium Box
+        const boxY = height - 400;
+        page.drawRectangle({
+            x: 50,
+            y: boxY,
+            width: 500,
+            height: 100,
+            color: rgb(0.98, 0.98, 0.98),
+            borderColor: rgb(0.12, 0.23, 0.54),
+            borderWidth: 1,
+        });
 
-        const buffer = await pdfPromise;
+        page.drawText('PREMIUM RAPORDA SİZİ NELER BEKLİYOR?', {
+            x: 70,
+            y: boxY + 70,
+            size: 12,
+            font: helveticaBold,
+            color: rgb(0.12, 0.23, 0.54),
+        });
 
-        return new NextResponse(buffer, {
+        page.drawText('- Yanlış Yapılan 5 Kritik Stratejik Hata', { x: 70, y: boxY + 50, size: 10, font: helvetica, color: rgb(0.4, 0.4, 0.4) });
+        page.drawText('- 90 Günlük Net Aksiyon Planı', { x: 70, y: boxY + 35, size: 10, font: helvetica, color: rgb(0.4, 0.4, 0.4) });
+
+        // Serialize the PDFDocument to bytes (a Uint8Array)
+        const pdfBytes = await pdfDoc.save();
+
+        console.log('PDF: Generation successful with pdf-lib');
+
+        return new NextResponse(pdfBytes, {
             headers: {
                 'Content-Type': 'application/pdf',
                 'Content-Disposition': 'attachment; filename="kariyer-on-rapor.pdf"',
-                'Content-Length': buffer.length.toString()
-            }
+                'Content-Length': pdfBytes.length.toString(),
+            },
         });
 
     } catch (err) {
-        console.error('PDF: Fatal error', err);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('PDF: Fatal error with pdf-lib', err);
+        return NextResponse.json({ error: 'Internal Server Error', details: err.message }, { status: 500 });
     }
 }
