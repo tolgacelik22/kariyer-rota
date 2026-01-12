@@ -5,6 +5,8 @@ import fs from 'fs';
 
 export async function POST(request) {
     console.log('PDF: Request received');
+    console.log('PDF: Current Working Directory:', process.cwd());
+
     try {
         let answers = {};
         try {
@@ -15,32 +17,36 @@ export async function POST(request) {
             console.error('PDF: Failed to parse JSON body', e);
         }
 
-        const chunks = [];
-        const doc = new PDFDocument({
+        const fontPath = path.join(process.cwd(), 'public/fonts/Inter-Regular.ttf');
+        const fontExists = fs.existsSync(fontPath);
+        console.log('PDF: Font path:', fontPath, 'Exists:', fontExists);
+
+        // IMPORTANT: We pass the font to the constructor to avoid loading default Helvetica
+        // which triggers the AFM loading error in standalone mode.
+        const docOptions = {
             margin: 50,
             size: 'A4',
             autoFirstPage: true
-        });
+        };
 
-        // Use custom font to avoid AFM dependency issues in standalone
-        const fontPath = path.join(process.cwd(), 'public/fonts/Inter-Regular.ttf');
-        const hasFont = fs.existsSync(fontPath);
-        console.log('PDF: Font check', { path: fontPath, exists: hasFont });
-
-        if (hasFont) {
-            doc.font(fontPath);
+        if (fontExists) {
+            docOptions.font = fontPath;
         }
+
+        console.log('PDF: Initializing PDFDocument constructor');
+        const doc = new PDFDocument(docOptions);
+        const chunks = [];
 
         doc.on('data', chunk => chunks.push(chunk));
 
         const pdfPromise = new Promise((resolve, reject) => {
             doc.on('end', () => {
-                console.log('PDF: Generation ended, chunks count:', chunks.length);
                 const pdfBuffer = Buffer.concat(chunks);
+                console.log('PDF: Generation finished, size:', pdfBuffer.length);
                 resolve(pdfBuffer);
             });
             doc.on('error', (err) => {
-                console.error('PDF: Generation error', err);
+                console.error('PDF: Generation error event', err);
                 reject(err);
             });
         });
@@ -60,14 +66,13 @@ export async function POST(request) {
         doc.moveDown();
 
         doc.fillColor('#000').fontSize(16).text('2. İletişim Bariyeri');
-        doc.fillColor('#666').fontSize(11).text('Zorlandığınız konu, genellikle üst yönetimle olan "değer kanıtlama" eksikliğinden gelmektedir. Görünür olmayan başarı, müzakere masasında argüman kaybına neden olur.');
+        doc.fillColor('#666').fontSize(11).text('Zorlandığınız konu, genellikle üst yönetimle olan "değer kanıtlama" eksikliğinden gelmektedir.');
         doc.moveDown(2);
 
-        doc.rect(50, doc.y, 500, 100).fillAndStroke('#f9fafb', '#1f3a8a');
-        doc.fillColor('#1f3a8a').fontSize(12).text('PREMIUM RAPORDA SİZİ NELER BEKLİYOR?', 70, doc.y - 80);
+        doc.rect(50, doc.y, 500, 80).fillAndStroke('#f9fafb', '#1f3a8a');
+        doc.fillColor('#1f3a8a').fontSize(12).text('PREMIUM RAPORDA SİZİ NELER BEKLİYOR?', 70, doc.y - 65);
         doc.fillColor('#666').fontSize(10).text('- Yanlış Yapılan 5 Kritik Stratejik Hata', 70, doc.y + 5);
-        doc.text('- Üst Yönetimle Konuşma Stratejisi (Cümle Örtekli)', 70, doc.y + 5);
-        doc.text('- 90 Günlük Adım Adım Aksiyon Planı', 70, doc.y + 5);
+        doc.text('- 90 Günlük Net Aksiyon Planı', 70, doc.y + 5);
 
         doc.end();
 
@@ -82,10 +87,11 @@ export async function POST(request) {
         });
 
     } catch (err) {
-        console.error('PDF: Fatal error', err);
+        console.error('PDF: Fatal error caught', err);
         return NextResponse.json({
             error: 'Internal Server Error',
-            details: err.message
+            details: err.message,
+            cwd: process.cwd()
         }, { status: 500 });
     }
 }
