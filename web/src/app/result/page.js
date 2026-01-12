@@ -109,7 +109,7 @@ export default function PartialResultPage() {
                         </button>
 
                         <a
-                            href={process.env.NEXT_PUBLIC_SHOPIER_URL || '#'}
+                            href="/api/payment/shopier"
                             target="_blank"
                             className="w-full bg-white border-4 border-[#1f3a8a] text-[#1f3a8a] py-5 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-gray-50 transition-all text-center block"
                         >
