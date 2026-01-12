@@ -25,12 +25,17 @@ services:
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@db-web-prod:5432/${DB_NAME:-kariyer_web}?schema=public
       - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_FROM=${SMTP_FROM}
+      - SHOPIER_OSB_USER=${SHOPIER_OSB_USER}
+      - SHOPIER_OSB_PASS=${SHOPIER_OSB_PASS}
+      - SHOPIER_PREMIUM_PRODUCT_IDS=${SHOPIER_PREMIUM_PRODUCT_IDS}
       - NEXT_PUBLIC_BASE_URL=https://kariyer.magicdigital.org
+      - HOSTNAME=0.0.0.0
     depends_on:
       db-web-prod:
         condition: service_healthy
