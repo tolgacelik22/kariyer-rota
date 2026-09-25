@@ -1,0 +1,17 @@
+name: deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  kariyerrota:
+    permissions:
+      contents: read
+      packages: write
+    uses: tolgacelik22/gh-workflows/.github/workflows/build-image.yml@main
+    with:
+      app: kariyerrota
+      context: .
+      dockerfile: Dockerfile
+      manifests_dir: kariyerrota
+    secrets:
+      INFRA_DEPLOY_KEY: ${{ secrets.INFRA_DEPLOY_KEY }}
