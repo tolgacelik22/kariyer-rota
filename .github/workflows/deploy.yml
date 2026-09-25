@@ -10,7 +10,7 @@ jobs:
     uses: tolgacelik22/gh-workflows/.github/workflows/build-image.yml@main
     with:
       app: kariyerrota
-      context: .
+      context: ./web
       dockerfile: Dockerfile
       manifests_dir: kariyerrota
     secrets:
