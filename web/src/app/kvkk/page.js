@@ -1,7 +1,7 @@
 import { KVKK_TEXT } from '@/lib/legal/kvkk';
 
 export const metadata = {
-    title: 'KVKK Aydınlatma Metni - Kariyer Rota',
+    title: 'KVKK Aydınlatma Metni — Promotly',
     description: 'Kariyer Rota Kişisel Verilerin Korunması Aydınlatma Metni ve Açık Rıza Formu',
 };
 
@@ -22,7 +22,7 @@ export default function KvkkPage() {
                 </div>
 
                 <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    <span>Kariyer Rota</span>
+                    <span>Promotly · Kariyer Rota</span>
                     <span>Son Güncelleme: 2026</span>
                 </div>
             </div>

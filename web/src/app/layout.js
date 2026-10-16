@@ -3,7 +3,7 @@ import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const geistMono = Geist_Mono({
@@ -12,16 +12,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Kariyer Rota — Detaylı Kariyer Analiz Raporu",
-  description: "Kariyerinizle ilgili kritik kararlar alırken veri odaklı analiz raporunuzu oluşturun.",
+  title: "Promotly — Terfi ve Başarı Arşivi",
+  description:
+    "Her cuma 5 dakika ayır, yaptıklarını kaydet. Performans görüşmesinde ne yaptığını hatırlamaya çalışma; AI kanıtlarla desteklenmiş raporunu hazırlasın.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="tr">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

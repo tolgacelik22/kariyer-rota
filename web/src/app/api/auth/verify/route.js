@@ -1,62 +1,40 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
-
 import crypto from 'crypto';
+import prisma from '@/lib/prisma';
 import { trackEvent } from '@/lib/tracking';
+import { AUTH_COOKIE, signSession, sessionCookieOptions } from '@/lib/auth';
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const rawToken = searchParams.get('token');
+    const nextParam = searchParams.get('next') || '/app';
+    const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/app';
+    const base = process.env.NEXT_PUBLIC_BASE_URL;
 
     if (!rawToken) {
-        return NextResponse.redirect(new URL('/?error=missing_token', process.env.NEXT_PUBLIC_BASE_URL));
+        return NextResponse.redirect(new URL('/giris?error=missing_token', base));
     }
 
     try {
         const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-
         const tokenRecord = await prisma.token.findUnique({
             where: { hash: tokenHash },
-            include: { user: true }
+            include: { user: true },
         });
 
         if (!tokenRecord || tokenRecord.usedAt || tokenRecord.expiresAt < new Date()) {
-            console.warn(`Invalid or expired token attempt: ${rawToken}`);
-            return NextResponse.redirect(new URL('/?error=invalid_token', process.env.NEXT_PUBLIC_BASE_URL));
+            return NextResponse.redirect(new URL('/giris?error=invalid_token', base));
         }
 
-        // Mark token as used
-        await prisma.token.update({
-            where: { id: tokenRecord.id },
-            data: { usedAt: new Date() }
-        });
+        await prisma.token.update({ where: { id: tokenRecord.id }, data: { usedAt: new Date() } });
 
-        // Create session JWT
-        const sessionToken = jwt.sign(
-            { userId: tokenRecord.userId, email: tokenRecord.user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: '30d' }
-        );
+        const response = NextResponse.redirect(new URL(next, base));
+        response.cookies.set(AUTH_COOKIE, signSession(tokenRecord.user), sessionCookieOptions);
 
-        // Set authentication cookie
-        const cookieStore = await cookies();
-        cookieStore.set('auth_token', sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 60 * 60 * 24 * 30, // 30 days
-            path: '/',
-            sameSite: 'lax'
-        });
-
-        await trackEvent('magic_link_opened', {
-            userId: tokenRecord.userId,
-            email: tokenRecord.user.email
-        });
-
-        return NextResponse.redirect(new URL('/report', process.env.NEXT_PUBLIC_BASE_URL));
+        await trackEvent('magic_link_opened', { userId: tokenRecord.userId, email: tokenRecord.user.email });
+        return response;
     } catch (err) {
         console.error('Token verification failed:', err);
-        return NextResponse.redirect(new URL('/?error=system_error', process.env.NEXT_PUBLIC_BASE_URL));
+        return NextResponse.redirect(new URL('/giris?error=system_error', base));
     }
 }

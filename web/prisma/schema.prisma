@@ -15,8 +15,16 @@ model User {
   utmSource            String?
   utmMedium            String?
   utmCampaign          String?
+  name                 String?
+  jobTitle             String?
+  proUntil             DateTime?
+  proPlan              String?        // monthly | yearly
+  priceVariant         String?
+  reminderOptIn        Boolean        @default(true)
   createdAt            DateTime       @default(now())
   surveyResults        SurveyResult[]
+  weeklyEntries        WeeklyEntry[]
+  reports              Report[]
   shopierOrders        ShopierOrder[]
   events               Event[]
   tokens               Token[]
@@ -105,4 +113,39 @@ model PendingPurchase {
   expiresAt DateTime
 
   @@index([email])
+}
+
+model WeeklyEntry {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStart  DateTime // Monday 00:00 UTC of the week
+  wins       String   // what was done
+  impact     String?  // measurable results
+  challenges String?
+  learnings  String?
+  nextWeek   String?
+  tags       String[]
+  links      String[] // evidence: Jira / GitHub / doc links
+  mood       Int?
+  aiSummary  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, weekStart])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   // monthly | quarterly | review | stories
+  periodStart DateTime
+  periodEnd   DateTime
+  content     String   // markdown
+  source      String   // ai | template
+  entryCount  Int
+  createdAt   DateTime @default(now())
+
+  @@index([userId, type])
 }

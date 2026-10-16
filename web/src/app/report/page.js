@@ -52,7 +52,7 @@ export default async function ReportPage(props) {
             <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-4">
                 <h1 className="text-xl font-bold">Rapor Bulunamadı</h1>
                 <p className="text-gray-500">Lütfen quizi tekrar çözün veya destek ile iletişime geçin.</p>
-                <a href="/" className="bg-[#1f3a8a] text-white px-8 py-3 rounded-xl font-bold">Quizi Başlat</a>
+                <a href="/analiz" className="bg-[#1f3a8a] text-white px-8 py-3 rounded-xl font-bold">Quizi Başlat</a>
             </div>
         );
     }

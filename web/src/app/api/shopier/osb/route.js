@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import crypto from 'crypto';
 import { trackEvent } from '@/lib/tracking';
+import { planForOrder, extendPro } from '@/lib/plans';
 
 export async function POST(request) {
     try {
@@ -63,7 +64,38 @@ export async function POST(request) {
             }
         });
 
-        // 3. Extract Report ID from customernote if present (Format: "rid:REPORT_ID")
+        // 3a. Promotly Pro purchase (product id, "plan:" note, or a recent checkout click)
+        let proPlan = planForOrder({ productid, customernote });
+        if (!proPlan && targetEmail) {
+            const pendingPro = await prisma.pendingPurchase.findFirst({
+                where: {
+                    email: targetEmail,
+                    reportId: { startsWith: 'pro:' },
+                    createdAt: { gte: new Date(Date.now() - 60 * 60 * 1000) },
+                },
+                orderBy: { createdAt: 'desc' },
+            });
+            if (pendingPro) proPlan = pendingPro.reportId.slice(4);
+        }
+        if (proPlan && targetEmail) {
+            const user = await prisma.$transaction(async (tx) => {
+                const u = await tx.user.upsert({
+                    where: { email: targetEmail },
+                    update: {},
+                    create: { email: targetEmail },
+                });
+                await tx.shopierOrder.update({ where: { id: shopierOrder.id }, data: { userId: u.id } });
+                return extendPro(tx, u.id, proPlan);
+            });
+            await trackEvent('pro_purchase_success', {
+                email: targetEmail,
+                userId: user.id,
+                properties: { orderId: shopierOrderId, plan: proPlan, variant: user.priceVariant, amount: parseFloat(price) || 0 },
+            });
+            return new Response('success', { status: 200, headers: { 'Content-Type': 'text/plain' } });
+        }
+
+        // 3b. Legacy report purchase: Report ID from customernote (Format: "rid:REPORT_ID")
         let reportId = null;
         if (customernote && customernote.includes('rid:')) {
             const match = customernote.match(/rid:([a-zA-Z0-9_\-]+)/);
@@ -75,6 +107,7 @@ export async function POST(request) {
             const pending = await prisma.pendingPurchase.findFirst({
                 where: {
                     email: targetEmail,
+                    NOT: { reportId: { startsWith: 'pro:' } },
                     createdAt: { gte: new Date(Date.now() - 30 * 60 * 1000) } // Last 30 mins
                 },
                 orderBy: { createdAt: 'desc' }

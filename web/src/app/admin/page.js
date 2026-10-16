@@ -1,6 +1,9 @@
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
-import { redirect } from 'next/navigation';
+import { weekStartOf, weeksBetween } from '@/lib/week';
+import { pricesFor } from '@/lib/plans';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminPage({ searchParams }) {
     const params = await searchParams;
@@ -35,6 +38,7 @@ export default async function AdminPage({ searchParams }) {
     ]);
 
     const convRate = userCount > 0 ? ((premiumCount / userCount) * 100).toFixed(1) : 0;
+    const promotly = await promotlyStats();
 
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -45,6 +49,46 @@ export default async function AdminPage({ searchParams }) {
                         System Live | {new Date().toISOString()}
                     </div>
                 </header>
+
+                {/* Promotly: habit + willingness to pay */}
+                <section className="space-y-4">
+                    <h2 className="text-lg font-bold uppercase tracking-widest">Promotly</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+                        <StatCard label="Kayıt tutan" value={promotly.loggers} />
+                        <StatCard label="Bu hafta kayıt" value={promotly.thisWeek} />
+                        <StatCard label="6. hafta tutunma" value={promotly.week6} highlight />
+                        <StatCard label="Aktif Pro" value={promotly.activePro} highlight />
+                        <StatCard label="MRR (tahmini)" value={`${promotly.mrr.toLocaleString('tr-TR')} TL`} />
+                        <StatCard label="Rapor" value={promotly.reports} />
+                    </div>
+                    <div className="bg-white border border-gray-100 rounded-md overflow-hidden shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-gray-50 text-gray-400 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th className="p-4">Fiyat varyantı (aylık)</th>
+                                    <th className="p-4">Kullanıcı</th>
+                                    <th className="p-4">Ödeme tıklaması</th>
+                                    <th className="p-4">Satın alma</th>
+                                    <th className="p-4">Dönüşüm</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {promotly.variants.map((v) => (
+                                    <tr key={v.variant}>
+                                        <td className="p-4 font-bold">{v.variant} TL</td>
+                                        <td className="p-4">{v.users}</td>
+                                        <td className="p-4">{v.clicks}</td>
+                                        <td className="p-4">{v.purchases}</td>
+                                        <td className="p-4">{v.users ? ((v.purchases / v.users) * 100).toFixed(1) : 0}%</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="text-xs text-gray-400">
+                        6. hafta tutunma: ilk kaydı en az 6 hafta önce olan kullanıcılardan 6. haftasında veya sonrasında hâlâ kayıt girenlerin oranı ({promotly.week6Base} kişi).
+                    </p>
+                </section>
 
                 {/* Totals */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -116,6 +160,54 @@ export default async function AdminPage({ searchParams }) {
             </div>
         </div>
     );
+}
+
+async function promotlyStats() {
+    const thisWeek = weekStartOf();
+    const [entries, proUsers, reports, users, events] = await Promise.all([
+        prisma.weeklyEntry.findMany({ select: { userId: true, weekStart: true } }),
+        prisma.user.findMany({ where: { proUntil: { gt: new Date() } }, select: { proPlan: true, priceVariant: true } }),
+        prisma.report.count(),
+        prisma.user.groupBy({ by: ['priceVariant'], _count: true }),
+        prisma.event.findMany({ where: { name: { in: ['checkout_clicked', 'pro_purchase_success'] } }, select: { name: true, properties: true } }),
+    ]);
+
+    const byUser = {};
+    for (const e of entries) (byUser[e.userId] ||= []).push(new Date(e.weekStart));
+    let week6Base = 0;
+    let week6Kept = 0;
+    for (const weeks of Object.values(byUser)) {
+        const first = new Date(Math.min(...weeks));
+        if (weeksBetween(first, thisWeek) < 5) continue;
+        week6Base++;
+        if (weeks.some((w) => weeksBetween(first, w) >= 5)) week6Kept++;
+    }
+
+    const mrr = proUsers.reduce((sum, u) => {
+        const p = pricesFor(u.priceVariant);
+        return sum + (u.proPlan === 'yearly' ? p.yearly / 12 : p.monthly);
+    }, 0);
+
+    const variants = {};
+    const row = (v) => (variants[v] ||= { variant: v, users: 0, clicks: 0, purchases: 0 });
+    for (const u of users) if (u.priceVariant) row(u.priceVariant).users += u._count;
+    for (const ev of events) {
+        const v = ev.properties?.variant;
+        if (!v) continue;
+        if (ev.name === 'checkout_clicked') row(v).clicks++;
+        else row(v).purchases++;
+    }
+
+    return {
+        loggers: Object.keys(byUser).length,
+        thisWeek: entries.filter((e) => new Date(e.weekStart).getTime() === thisWeek.getTime()).length,
+        week6: week6Base ? `${Math.round((week6Kept / week6Base) * 100)}%` : '—',
+        week6Base,
+        activePro: proUsers.length,
+        mrr: Math.round(mrr),
+        reports,
+        variants: Object.values(variants).sort((a, b) => Number(a.variant) - Number(b.variant)),
+    };
 }
 
 function StatCard({ label, value, highlight = false }) {

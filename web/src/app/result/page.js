@@ -18,7 +18,7 @@ function ResultContent() {
         const rid = searchParams.get('rid') || localStorage.getItem('survey_id');
 
         if (!rid) {
-            router.push('/');
+            router.push('/analiz');
         } else {
             setSurveyId(rid);
             localStorage.setItem('survey_id', rid);
