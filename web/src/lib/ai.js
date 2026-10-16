@@ -68,7 +68,7 @@ function profileLine(user) {
 export async function weeklySummary(entry, user) {
     return complete(
         BASE_SYSTEM,
-        `${profileLine(user)}\nBu haftalık kaydı yöneticiye iletilecek 3 maddelik bir özete çevir. Her madde "- " ile başlayan, birinci tekil şahıs geçmiş zamanlı tek bir cümle olsun (ör. "- Ödeme hatalarını %68 azaltan yeniden deneme mekanizmasını canlıya aldım."); "Fiil:" gibi etiket koyma. İlgili etkiyi aynı maddeye bağla. Başlık kullanma.\n\n${entryToText(entry)}`,
+        `${profileLine(user)}\nBu haftalık kaydı yöneticiye iletilecek 3 maddelik bir özete çevir. Her madde "- " ile başlayan, birinci tekil şahıs geçmiş zamanlı tek bir cümle olsun (ör. "- Ödeme hatalarını %68 azaltan yeniden deneme mekanizmasını canlıya aldım."); "Fiil:" gibi etiket koyma. İlgili etkiyi aynı maddeye bağla. En fazla 3 madde yaz; kayıtta yeterli bilgi yoksa daha az madde yaz, dolgu madde ekleme. Bu özette "ölçüm eklenmeli" gibi not ya da köşeli parantez kullanma. Başlık kullanma.\n\n${entryToText(entry)}`,
         400,
     );
 }

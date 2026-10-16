@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import prisma from './prisma';
 
@@ -16,9 +16,11 @@ export const sessionCookieOptions = {
     sameSite: 'lax',
 };
 
+// Web uses the httpOnly cookie; the mobile app sends the same JWT as a Bearer token.
 export async function getCurrentUser() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(AUTH_COOKIE)?.value;
+    const auth = (await headers()).get('authorization') || '';
+    const bearer = auth.startsWith('Bearer ') ? auth.slice(7) : null;
+    const token = bearer || (await cookies()).get(AUTH_COOKIE)?.value;
     if (!token) return null;
     try {
         const { userId } = jwt.verify(token, process.env.JWT_SECRET);

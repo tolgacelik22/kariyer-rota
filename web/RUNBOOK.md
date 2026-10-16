@@ -25,10 +25,10 @@ npm run dev                          # http://localhost:3000
 Without SMTP, `/giris` shows the login link on screen (dev, or `DEMO_MODE=1` with `next start`).
 
 ## 2. Production rollout (k3s + ArgoCD, push to main = deploy)
-1. **Schema first** (additive: new columns on `User`, new tables `WeeklyEntry`, `Report`) — run against the prod DB
+1. **Schema first** (additive: new columns on `User` and `Token.attempts`, new tables `WeeklyEntry`, `Report`) — run against the prod DB
    before the new image starts, e.g. from a machine with the repo: `DATABASE_URL=<prod> npx prisma db push`
    (port-forward `svc/db-web-prod` in namespace `kariyerrota`).
-2. Add env to secret `kariyerrota-env`: `OPENAI_API_KEY`, `OPENAI_MODEL`, `CRON_SECRET`, `NEXT_PUBLIC_PRICE_VARIANTS`,
+2. Add env to secret `kariyerrota-env`: `OPENAI_API_KEY`, `OPENAI_MODEL`, `CRON_SECRET`, `REVENUECAT_WEBHOOK_SECRET`, `NEXT_PUBLIC_PRICE_VARIANTS`,
    `SHOPIER_PRO_MONTHLY_URL`, `SHOPIER_PRO_YEARLY_URL`, `SHOPIER_PRO_MONTHLY_PRODUCT_IDS`, `SHOPIER_PRO_YEARLY_PRODUCT_IDS`.
    `NEXT_PUBLIC_*` values are baked in at build time — set them as build args too if they differ from defaults.
 3. Scheduler: daily CronJob → `GET https://kariyer.magicdigital.org/api/cron/reminders?secret=$CRON_SECRET`

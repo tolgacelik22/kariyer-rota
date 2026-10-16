@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "Promotly",
+    "slug": "promotly",
+    "version": "1.0.0",
+    "description": "Terfi ve Başarı Arşivi — her cuma 5 dakika, 6 ayda kanıtlı terfi dosyası.",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "promotly",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F5F6FA",
+    "ios": {
+      "bundleIdentifier": "org.magicdigital.promotly",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "org.magicdigital.promotly",
+      "adaptiveIcon": {
+        "backgroundColor": "#1F3A8A",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "permissions": ["com.android.vending.BILLING"],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Promotly",
+      "themeColor": "#1F3A8A"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#1F3A8A"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#1F3A8A",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

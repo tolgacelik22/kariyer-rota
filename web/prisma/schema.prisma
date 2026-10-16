@@ -60,7 +60,8 @@ model Token {
   hash      String    @unique
   userId    String
   user      User      @relation(fields: [userId], references: [id])
-  type      String    // magic_link
+  type      String    // magic_link | login_code
+  attempts  Int       @default(0)
   usedAt    DateTime?
   expiresAt DateTime
   createdAt DateTime  @default(now())
