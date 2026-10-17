@@ -1,0 +1,22 @@
+{
+  "name": "promotly-marketing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "voice": "node scripts/voice.mjs",
+    "stills": "node scripts/render-stills.mjs",
+    "videos": "node scripts/render-videos.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.536",
+    "@remotion/cli": "^4.0.536",
+    "@remotion/google-fonts": "^4.0.536",
+    "@remotion/media-utils": "^4.0.536",
+    "@remotion/renderer": "^4.0.536",
+    "msedge-tts": "^2.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.536"
+  }
+}

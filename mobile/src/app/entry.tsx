@@ -122,7 +122,15 @@ export default function EntryComposer() {
     setSaving(true);
     setError(null);
     try {
-      const { entry } = await api<{ entry: Entry }>('/api/entries', { method: 'PUT', body: { weekStart: week, ...form } });
+      // Drop starter chips that were tapped but never completed ("Çözdüm:" alone).
+      const clean = (s: string) => s.split('\n').filter((l) => !/^[^:]{0,30}:\s*$/.test(l.trim())).join('\n').trim();
+      const body = { weekStart: week, ...form, wins: clean(form.wins), impact: clean(form.impact) };
+      if (!body.wins) {
+        setError('Bu hafta yaptıklarını en az bir cümleyle yaz.');
+        setStep(0);
+        return;
+      }
+      const { entry } = await api<{ entry: Entry }>('/api/entries', { method: 'PUT', body });
       const d = await api<EntriesResponse>('/api/entries');
       haptic('success');
       setSaved({ entry, streak: d.stats.streak, total: d.stats.total });
@@ -355,6 +363,8 @@ function Field({ value, onChange, placeholder, minHeight = 90, label, inputRef }
         placeholderTextColor={C.faint}
         multiline
         ref={inputRef}
+        spellCheck={false}
+        autoCorrect={process.env.EXPO_PUBLIC_MARKETING !== '1'}
         textAlignVertical="top"
         style={[styles.field, { minHeight }]}
       />

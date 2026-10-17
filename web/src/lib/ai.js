@@ -32,6 +32,7 @@ async function complete(system, user, maxTokens = 1800) {
 const BASE_SYSTEM = `Sen Promotly'nin kariyer asistanısın. Türkçe, profesyonel ve somut yazarsın.
 Kurallar:
 - Yalnızca kullanıcının kayıtlarındaki bilgileri kullan; rakam, proje veya sonuç uydurma.
+- Kayıtta geçmeyen hiçbir sayı, yüzde, tutar veya süre yazma. Bilgi azsa kısa yaz; boşluğu tahminle doldurma.
 - Ölçülebilir etkileri (%, süre, tutar, adet) öne çıkar; yoksa "ölçüm eklenmeli" diye işaretle.
 - Kanıt bağlantılarını ilgili maddenin yanında [kanıt](url) olarak koru.
 - Çıktı Markdown olsun: ## başlıklar, - maddeler, **kalın** vurgular. Giriş/kapanış cümlesi yazma.`;
@@ -65,11 +66,32 @@ function profileLine(user) {
     return [user.name && `Ad: ${user.name}`, user.jobTitle && `Pozisyon: ${user.jobTitle}`].filter(Boolean).join(' · ');
 }
 
+// Labels like "Canlıya aldım:" with nothing after them carry no information.
+function meaningfulText(s) {
+    return String(s || '')
+        .split('\n')
+        .map((l) => l.replace(/^[^:\n]{0,30}:\s*$/, '').trim())
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 export async function weeklySummary(entry, user) {
-    return complete(
+    // Too little to summarise: the model would only invent details.
+    if (meaningfulText(entry.wins).length + meaningfulText(entry.impact).length < 25) return null;
+    const text = await complete(
         BASE_SYSTEM,
         `${profileLine(user)}\nBu haftalık kaydı yöneticiye iletilecek 3 maddelik bir özete çevir. Her madde "- " ile başlayan, birinci tekil şahıs geçmiş zamanlı tek bir cümle olsun (ör. "- Ödeme hatalarını %68 azaltan yeniden deneme mekanizmasını canlıya aldım."); "Fiil:" gibi etiket koyma. İlgili etkiyi aynı maddeye bağla. En fazla 3 madde yaz; kayıtta yeterli bilgi yoksa daha az madde yaz, dolgu madde ekleme. Bu özette "ölçüm eklenmeli" gibi not ya da köşeli parantez kullanma. Başlık kullanma.\n\n${entryToText(entry)}`,
         400,
+    );
+    if (!text) return null;
+    // The shared system prompt asks reports to flag missing metrics; in a 3-line summary that's just filler.
+    return (
+        text
+            .split('\n')
+            .map((l) => l.replace(/\s*\[?\(?ölçüm eklenmeli\)?\]?\.?/gi, '').trimEnd())
+            .filter((l) => l.replace(/^[-*\s]+/, '').trim().length > 0)
+            .join('\n') || null
     );
 }
 

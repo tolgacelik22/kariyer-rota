@@ -47,7 +47,7 @@ const pro = await seedUser(
     WEEKS,
 );
 // Free user: no entry this week, so the form is empty and the streak continues from last week.
-const free = await seedUser('free@promotly.local', { name: 'Ece', jobTitle: 'Ürün Yöneticisi', proUntil: null, proPlan: null, priceVariant: '149' }, WEEKS.slice(0, 7));
+const free = await seedUser('free@promotly.local', { name: 'Ece', jobTitle: 'Ürün Yöneticisi', proUntil: null, proPlan: null, priceVariant: '199' }, WEEKS.slice(0, 7));
 await prisma.weeklyEntry.deleteMany({ where: { userId: free.id, weekStart: weekStartOf() } });
 await prisma.weeklyEntry.create({
     data: { userId: free.id, weekStart: new Date(weekStartOf().getTime() - 7 * WEEK), wins: 'Kullanıcı görüşmelerinden 12 içgörü çıkardım.', tags: ['araştırma'], links: [] },

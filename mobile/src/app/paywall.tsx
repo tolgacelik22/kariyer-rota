@@ -12,6 +12,9 @@ import { API_URL } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { getPlans, Plan, purchase, restore, STORE_MODE } from '@/lib/purchases';
 
+// Marketing captures (EXPO_PUBLIC_MARKETING=1) show the store subscription copy instead of the demo note.
+const STORE_COPY = STORE_MODE || process.env.EXPO_PUBLIC_MARKETING === '1';
+
 const HEADLINES: Record<string, { title: string; sub: string }> = {
   offer: { title: 'Arşivin hazır.\nŞimdi dosyanı çıkar.', sub: 'Haftalarca biriktirdiğin kayıtları yöneticine hazır bir performans dosyasına dönüştür.' },
   summary: { title: 'Her haftaya\nAI özeti.', sub: 'Kaydını yöneticine iletebileceğin 3 net maddeye çeviririz.' },
@@ -178,7 +181,7 @@ export default function Paywall() {
             disabled={!plan}
           />
           <T v="small" style={styles.fine}>
-            {STORE_MODE
+            {STORE_COPY
               ? `Abonelik, dönem sonundan 24 saat önce iptal edilmezse otomatik yenilenir. ${Platform.OS === 'ios' ? 'App Store' : 'Google Play'} hesap ayarlarından yönetebilirsin.`
               : 'Demo sürümü: gerçek ödeme alınmaz, Pro bu hesapta test için açılır.'}
           </T>
