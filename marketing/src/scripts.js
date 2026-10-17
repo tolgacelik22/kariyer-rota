@@ -2,7 +2,7 @@
 export const SCRIPTS = {
   promo: {
     voice: 'tr-TR-AhmetNeural',
-    rate: '+4%',
+    rate: '+9%',
     pitch: '-2Hz',
     lines: [
       { scene: 'hook', text: 'Altı ay sonra performans görüşmesindesin. Son altı ayda ne yaptığını hatırlıyor musun?' },
@@ -12,12 +12,12 @@ export const SCRIPTS = {
       { scene: 'summary', text: 'Yapay zekâ her haftayı, yöneticine iletebileceğin net bir özete çevirir.' },
       { scene: 'report', text: 'Altı ayın sonunda kanıtlarla dolu terfi dosyan tek dokunuşla hazır.' },
       { scene: 'privacy', text: 'Şirket sistemlerine bağlanmaz. Veriler senin; istediğin an indir ya da sil.' },
-      { scene: 'cta', text: 'Promotly. Terfi ve başarı arşivin. Ücretsiz başla.' },
+      { scene: 'cta', text: 'Promotly, terfi ve başarı arşivin. App Store ve Google Play’de, ücretsiz.' },
     ],
   },
   story: {
     voice: 'tr-TR-EmelNeural',
-    rate: '+8%',
+    rate: '+11%',
     pitch: '+0Hz',
     lines: [
       { scene: 'hook', text: 'Geçen yıl performans görüşmemde resmen boş kaldım.' },
@@ -27,7 +27,7 @@ export const SCRIPTS = {
       { scene: 'summary', text: 'Uygulama bunu, yöneticime direkt gönderebileceğim üç maddeye çeviriyor.' },
       { scene: 'report', text: 'Bu dönem görüşmeye altı aylık terfi dosyamla girdim. Her katkının yanında kanıtı vardı.' },
       { scene: 'feeling', text: 'İlk defa ne söyleyeceğimi düşünmedim. Hepsi önümdeydi.' },
-      { scene: 'cta', text: 'Sen de bu cuma başla. Promotly, ücretsiz.' },
+      { scene: 'cta', text: 'Sen de bu cuma başla. Promotly, App Store ve Google Play’de ücretsiz.' },
     ],
   },
 };

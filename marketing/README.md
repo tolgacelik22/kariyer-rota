@@ -9,17 +9,24 @@ Her şey bu klasörden yeniden üretilebilir. Ekran görüntüleri gerçek uygul
 | `play-store/store-1..8.png` | Google Play telefon ekran görüntüleri (sırayla yükle) | 1080×1920 |
 | `play-store/feature-graphic.png` | Google Play öne çıkan görsel | 1024×500 |
 | `play-store/app-icon-512.png` | Google Play uygulama simgesi | 512×512 |
-| `subscription/subscription-1..3.png` | Abonelik/paywall ekranları, çerçeveli (mağaza sayfası, iç sunum) | 1080×1920 |
-| `subscription/raw-*.png` | Paywall ham ekran görüntüleri — App Store abonelik "Review Screenshot" vb. inceleme alanları için | 1080×2400 |
-| `video/promo-vertical.mp4` | Profesyonel tanıtım — Instagram Reels, TikTok, YouTube Shorts | 1080×1920, ~50 sn |
-| `video/promo-horizontal.mp4` | Profesyonel tanıtım — YouTube (yatay) | 1920×1080, ~50 sn |
-| `video/story-vertical.mp4` | Kullanıcı hikâyesi (birinci ağızdan, UGC tarzı) — Reels, TikTok, Shorts | 1080×1920, ~47 sn |
+| `subscription/subscription-1..3.png` | Google Play için abonelik/paywall ekranları, çerçeveli | 1080×1920 |
+| `subscription/raw-*.png` | Android paywall ham ekran görüntüleri | 1080×2400 |
+| `app-store/appstore-1..8.png` | App Store iPhone ekran görüntüleri (6,9"; Apple küçük ekranlara kendisi ölçekler), iOS durum çubuğu + Dynamic Island | 1290×2796 |
+| `app-store-subscription/appstore-subscription-1..3.png` | App Store sayfası için abonelik ekranları (metinde "App Store") | 1290×2796 |
+| `app-store-subscription/ios-review-paywall-*.png` | App Store Connect → her abonelik ürünü → **Review Screenshot** | 1080×2400 |
+| `video/promo-vertical.mp4` | Profesyonel tanıtım — Instagram Reels, TikTok, YouTube Shorts | 1080×1920, ~37 sn |
+| `video/promo-horizontal.mp4` | Profesyonel tanıtım — YouTube (yatay) | 1920×1080, ~37 sn |
+| `video/story-vertical.mp4` | Kullanıcı hikâyesi (birinci ağızdan, UGC tarzı) — Reels, TikTok, Shorts | 1080×1920, ~35 sn |
 
-Google Play aboneliklerde ayrı bir inceleme ekran görüntüsü istemez; `subscription/` klasörü App Store'a çıkılırsa ve mağaza sayfasında Pro'yu göstermek istersen hazır.
+Google Play aboneliklerde ayrı bir inceleme ekran görüntüsü istemez. App Store ise her abonelik ürünü için bir "Review Screenshot" ister: `app-store-subscription/ios-review-paywall-*.png`.
+
+App Store görsellerinde Android'e ait öğe yok (App Review 2.3.10). Görüntüler Android emülatöründen alındı; iOS durum çubuğu ve paywall'daki "App Store" metni üzerine çizildi. Arayüz iOS'ta aynı olduğu için doğru temsil ediyor, ama iOS derlemesi çıkınca iPhone simülatöründen gerçek görüntülerle değiştirmek en temizi.
 
 ## Videolar hakkında
 
 - Seslendirme: Microsoft Edge nöral sesleri (ücretsiz). Tanıtım: `tr-TR-AhmetNeural`, hikâye: `tr-TR-EmelNeural`. Altyazılar ses ile kelime kelime senkron.
+- Edge her cümleden sonra ~1 sn sessizlik bırakıyordu; robotik duraksamanın sebebi buydu. Artık her cümle ayrı üretilip konuşmanın bittiği yerden kırpılıyor, cümleler kısa bir nefesle birleştiriliyor.
+- Kapanışta iki mağaza da hem seslendirmede ("App Store ve Google Play’de") hem ekranda rozet olarak var. Rozetler metin tabanlı; Apple/Google'ın resmî rozet görsellerini kullanacaksan kendi marka kurallarına göre yerleştirilmeli.
 - Müzik: `scripts/music.mjs` ile kod ile üretildi — telif/lisans riski yok.
 - Hikâye videosunda yapay ses ile canlandırma yapıldığı için ekranda **"Canlandırmadır"** etiketi var. Gerçek bir kullanıcıya dayanmayan "terfi aldım" gibi sonuç iddiası bilerek yok (yanıltıcı reklam riski).
 - 9:16 videolarda altyazılar TikTok/Reels arayüzünün kapladığı alt bölgenin üstünde.
@@ -32,7 +39,10 @@ Google Play aboneliklerde ayrı bir inceleme ekran görüntüsü istemez; `subsc
 
 Avatar videosunu `public/` altına koyup `Story.tsx`'teki ilk iki sahneye yerleştirmek (yarım ekran avatar + yarım ekran uygulama) birkaç satırlık değişiklik.
 
-## Google Play metinleri (taslak)
+## Mağaza metinleri (taslak — App Store ve Google Play)
+
+**App Store alt başlık (30):** Terfi ve Başarı Arşivi
+**App Store anahtar kelimeler (100):** terfi,performans,kariyer,zam,değerlendirme,başarı,iş günlüğü,yönetici,cv,mülakat,özet
 
 **Kısa açıklama (80):** Her cuma 5 dakika. 6 ayda kanıtlarla dolu terfi ve performans dosyası.
 
@@ -48,7 +58,9 @@ Performans görüşmesinde "Son 6 ayda neler yaptın?" sorusuna hazır mısın? 
 • Cuma hatırlatması: Alışkanlık için her hafta nazik bir bildirim.
 • Gizlilik: Şirket sistemlerine bağlanmaz. Arşivini istediğin an indir ya da tek dokunuşla sil.
 
-Ücretsiz planda haftalık kayıt, son 8 haftanın geçmişi ve temel aylık özet bulunur. Promotly Pro aylık veya yıllık abonelikle sunulur; abonelik Google Play hesabından yönetilir ve istediğin zaman iptal edilebilir.
+Ücretsiz planda haftalık kayıt, son 8 haftanın geçmişi ve temel aylık özet bulunur. Promotly Pro aylık veya yıllık abonelikle sunulur; abonelik App Store / Google Play hesabından yönetilir ve istediğin zaman iptal edilebilir. Dönem sonundan en az 24 saat önce iptal edilmezse otomatik yenilenir.
+
+App Store açıklamasının sonuna şu bağlantılar eklenmeli (Apple abonelik kuralı): Kullanım Koşulları https://kariyer.magicdigital.org/kosullar · Gizlilik https://kariyer.magicdigital.org/kvkk
 
 ## Yeniden üretme
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, Audio, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
-import { Background, Captions, FullScreen, Logo } from './components';
+import { Background, Captions, FullScreen, Logo, StoreBadges, Voice } from './components';
 import { timeline } from './timeline';
 import { C, FPS, GRAD, INTER } from './theme';
 
@@ -62,7 +62,9 @@ const End: React.FC<{ f: number }> = ({ f }) => {
         <div style={{ opacity: btn, background: GRAD.gold, color: '#3A2300', fontWeight: 900, fontSize: 48, padding: '28px 64px', borderRadius: 999, transform: `scale(${1 + Math.sin(f / 6) * 0.015})`, boxShadow: '0 20px 50px rgba(245,165,36,0.45)' }}>
           Bu cuma başla
         </div>
-        <div style={{ opacity: btn, color: 'rgba(255,255,255,0.8)', fontSize: 34, fontWeight: 600 }}>Google Play’de · Ücretsiz</div>
+        <div style={{ opacity: btn, transform: `translateY(${(1 - btn) * 20}px)` }}>
+          <StoreBadges size={40} />
+        </div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -104,9 +106,7 @@ export const Story: React.FC = () => {
       {scenes.map((s, i) => (
         <Sequence key={s.scene} from={s.from} durationInFrames={s.frames} premountFor={FPS}>
           <Scene scene={s} index={i} />
-          <Sequence from={Math.round(s.voiceAt * FPS)}>
-            <Audio src={staticFile(s.file)} volume={1} />
-          </Sequence>
+          <Voice sentences={s.sentences} at={s.voiceAt} />
         </Sequence>
       ))}
       {/* Disclosure: dramatised testimonial with a synthetic voice. */}

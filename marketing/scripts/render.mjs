@@ -12,12 +12,14 @@ const comps = await getCompositions(serveUrl);
 fs.mkdirSync('out/play-store', { recursive: true });
 fs.mkdirSync('out/subscription', { recursive: true });
 fs.mkdirSync('out/video', { recursive: true });
+fs.mkdirSync('out/app-store', { recursive: true });
+fs.mkdirSync('out/app-store-subscription', { recursive: true });
 
 for (const c of comps) {
   const isStill = c.durationInFrames === 1;
   if (!want(c.id, isStill)) continue;
   if (isStill) {
-    const dir = c.id.startsWith('subscription') ? 'out/subscription' : 'out/play-store';
+    const dir = c.id.startsWith('appstore-subscription') || c.id.startsWith('ios-review') ? 'out/app-store-subscription' : c.id.startsWith('appstore') ? 'out/app-store' : c.id.startsWith('subscription') ? 'out/subscription' : 'out/play-store';
     await renderStill({ composition: c, serveUrl, output: path.resolve(dir, `${c.id}.png`), imageFormat: 'png' });
     console.log('still', c.id);
   } else {

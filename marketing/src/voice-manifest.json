@@ -1,857 +1,1068 @@
 {
   "promo": [
     {
-      "file": "voice/promo/0/audio.mp3",
-      "duration": 7.344,
+      "sentences": [
+        {
+          "file": "voice/promo/0-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.645875
+        },
+        {
+          "file": "voice/promo/0-1/audio.mp3",
+          "at": 2.7600000000000002,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.531207
+        }
+      ],
       "words": [
         {
           "text": "Altı",
-          "start": 0.048083,
-          "end": 0.336541
+          "start": 0.04,
+          "end": 0.31525
         },
         {
           "text": "ay",
-          "start": 0.492791,
-          "end": 0.685082
+          "start": 0.46429099999999995,
+          "end": 0.647791
         },
         {
           "text": "sonra",
-          "start": 0.685083,
-          "end": 1.081708
+          "start": 0.647791,
+          "end": 1.026249
         },
         {
           "text": "performans",
-          "start": 1.10575,
-          "end": 1.778833
+          "start": 1.0491659999999998,
+          "end": 1.691374
         },
         {
           "text": "görüşmesindesin",
-          "start": 1.778833,
-          "end": 2.668249
+          "start": 1.6913749999999999,
+          "end": 2.54
         },
         {
           "text": "Son",
-          "start": 3.75,
-          "end": 4.038458
+          "start": 2.8000000000000003,
+          "end": 3.07525
         },
         {
           "text": "altı",
-          "start": 4.122583,
-          "end": 4.423083
+          "start": 3.1555,
+          "end": 3.4422080000000004
         },
         {
           "text": "ayda",
-          "start": 4.423083,
-          "end": 4.723541
+          "start": 3.4422080000000004,
+          "end": 3.7288740000000002
         },
         {
           "text": "ne",
-          "start": 4.723541,
-          "end": 4.891791
+          "start": 3.728875,
+          "end": 3.889416
         },
         {
           "text": "yaptığını",
-          "start": 4.891833,
-          "end": 5.312499
+          "start": 3.889458,
+          "end": 4.290833000000001
         },
         {
           "text": "hatırlıyor",
-          "start": 5.3125,
-          "end": 5.841333
+          "start": 4.290833000000001,
+          "end": 4.795416000000001
         },
         {
           "text": "musun",
-          "start": 5.841333,
-          "end": 6.249999
+          "start": 4.795416000000001,
+          "end": 5.185332000000001
         }
-      ]
+      ],
+      "duration": 5.285332
     },
     {
-      "file": "voice/promo/1/audio.mp3",
-      "duration": 5.712,
+      "sentences": [
+        {
+          "file": "voice/promo/1-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.439458
+        },
+        {
+          "file": "voice/promo/1-1/audio.mp3",
+          "at": 2.553583,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 1.189416
+        }
+      ],
       "words": [
         {
           "text": "Çoğumuz",
-          "start": 0.048083,
-          "end": 0.456749
+          "start": 0.04,
+          "end": 0.42991599999999996
         },
         {
           "text": "sadece",
-          "start": 0.45675,
-          "end": 0.973541
+          "start": 0.42991599999999996,
+          "end": 0.923041
         },
         {
           "text": "son",
-          "start": 0.973541,
-          "end": 1.225957
+          "start": 0.923041,
+          "end": 1.163832
         },
         {
           "text": "iki",
-          "start": 1.225958,
-          "end": 1.394208
+          "start": 1.163833,
+          "end": 1.324374
         },
         {
           "text": "haftayı",
-          "start": 1.39425,
-          "end": 1.778833
+          "start": 1.3244159999999998,
+          "end": 1.691374
         },
         {
           "text": "hatırlarız",
-          "start": 1.778833,
-          "end": 2.451916
+          "start": 1.6913749999999999,
+          "end": 2.333583
         },
         {
           "text": "Gerisi",
-          "start": 3.509625,
-          "end": 4.0625
+          "start": 2.593583,
+          "end": 3.121083
         },
         {
           "text": "kaybolur",
-          "start": 4.0625,
-          "end": 4.603375
+          "start": 3.121083,
+          "end": 3.637124
         }
-      ]
+      ],
+      "duration": 3.737124
     },
     {
-      "file": "voice/promo/2/audio.mp3",
-      "duration": 4.032,
+      "sentences": [
+        {
+          "file": "voice/promo/2-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.875208
+        }
+      ],
       "words": [
         {
           "text": "Promotly",
-          "start": 0.048083,
-          "end": 0.685083
+          "start": 0.04,
+          "end": 0.647791
         },
         {
           "text": "ile",
-          "start": 0.685083,
-          "end": 0.949499
+          "start": 0.647791,
+          "end": 0.900082
         },
         {
           "text": "her",
-          "start": 0.961541,
-          "end": 1.225957
+          "start": 0.911541,
+          "end": 1.163832
         },
         {
           "text": "cuma",
-          "start": 1.225958,
-          "end": 1.526458
+          "start": 1.163833,
+          "end": 1.4505409999999999
         },
         {
           "text": "sadece",
-          "start": 1.526458,
-          "end": 2.043249
+          "start": 1.4505409999999999,
+          "end": 1.943666
         },
         {
           "text": "beş",
-          "start": 2.04325,
-          "end": 2.247583
+          "start": 1.943666,
+          "end": 2.138624
         },
         {
           "text": "dakika",
-          "start": 2.247583,
-          "end": 2.632208
+          "start": 2.1386249999999998,
+          "end": 2.505583
         },
         {
           "text": "ayır",
-          "start": 2.632208,
-          "end": 2.908666
+          "start": 2.505583,
+          "end": 2.769333
         }
-      ]
+      ],
+      "duration": 2.869333
     },
     {
-      "file": "voice/promo/3/audio.mp3",
-      "duration": 4.656,
+      "sentences": [
+        {
+          "file": "voice/promo/3-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 3.471541
+        }
+      ],
       "words": [
         {
           "text": "Ne",
-          "start": 0.048083,
-          "end": 0.204333
+          "start": 0.04,
+          "end": 0.189083
         },
         {
           "text": "yaptığını",
-          "start": 0.432708,
-          "end": 0.961541
+          "start": 0.406958,
+          "end": 0.911541
         },
         {
           "text": "etkisini",
-          "start": 1.08175,
-          "end": 1.598541
+          "start": 1.0262499999999999,
+          "end": 1.519375
         },
         {
           "text": "ve",
-          "start": 1.598541,
-          "end": 1.718749
+          "start": 1.519375,
+          "end": 1.6340409999999999
         },
         {
           "text": "kanıtını",
-          "start": 1.71875,
-          "end": 2.1875
+          "start": 1.6340409999999999,
+          "end": 2.081291
         },
         {
           "text": "rehberli",
-          "start": 2.1875,
-          "end": 2.66825
+          "start": 2.081291,
+          "end": 2.539999
         },
         {
           "text": "üç",
-          "start": 2.66825,
-          "end": 2.800458
+          "start": 2.54,
+          "end": 2.666125
         },
         {
           "text": "adımda",
-          "start": 2.8005,
-          "end": 3.100958
+          "start": 2.666125,
+          "end": 2.952833
         },
         {
           "text": "kaydet",
-          "start": 3.100958,
-          "end": 3.533666
+          "start": 2.952833,
+          "end": 3.365666
         }
-      ]
+      ],
+      "duration": 3.465666
     },
     {
-      "file": "voice/promo/4/audio.mp3",
-      "duration": 5.616,
+      "sentences": [
+        {
+          "file": "voice/promo/4-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 4.388999999999999
+        }
+      ],
       "words": [
         {
           "text": "Yapay",
-          "start": 0.048083,
-          "end": 0.685083
+          "start": 0.04,
+          "end": 0.647791
         },
         {
           "text": "zekâ",
-          "start": 0.685083,
-          "end": 1.033624
+          "start": 0.647791,
+          "end": 0.9803740000000001
         },
         {
           "text": "her",
-          "start": 1.033666,
-          "end": 1.237999
+          "start": 0.980375,
+          "end": 1.175333
         },
         {
           "text": "haftayı",
-          "start": 1.238,
-          "end": 1.742791
+          "start": 1.175333,
+          "end": 1.6569989999999999
         },
         {
           "text": "yöneticine",
-          "start": 1.887,
-          "end": 2.487958
+          "start": 1.7945829999999998,
+          "end": 2.367958
         },
         {
           "text": "iletebileceğin",
-          "start": 2.488,
-          "end": 3.317333
+          "start": 2.367958,
+          "end": 3.159249
         },
         {
           "text": "net",
-          "start": 3.329333,
-          "end": 3.545666
+          "start": 3.17075,
+          "end": 3.377166
         },
         {
           "text": "bir",
-          "start": 3.58175,
-          "end": 3.713958
+          "start": 3.4115409999999997,
+          "end": 3.5377069999999997
         },
         {
           "text": "özete",
-          "start": 3.713958,
-          "end": 4.026458
+          "start": 3.537708,
+          "end": 3.835874
         },
         {
           "text": "çevirir",
-          "start": 4.026458,
-          "end": 4.495208
+          "start": 3.835875,
+          "end": 4.283125
         }
-      ]
+      ],
+      "duration": 4.383125
     },
     {
-      "file": "voice/promo/5/audio.mp3",
-      "duration": 4.992,
+      "sentences": [
+        {
+          "file": "voice/promo/5-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 3.8041240000000003
+        }
+      ],
       "words": [
         {
           "text": "Altı",
-          "start": 0.048083,
-          "end": 0.324541
+          "start": 0.04,
+          "end": 0.30374999999999996
         },
         {
           "text": "ayın",
-          "start": 0.48075,
-          "end": 0.721125
+          "start": 0.452833,
+          "end": 0.682208
         },
         {
           "text": "sonunda",
-          "start": 0.721166,
-          "end": 1.117791
+          "start": 0.682208,
+          "end": 1.060624
         },
         {
           "text": "kanıtlarla",
-          "start": 1.117791,
-          "end": 1.742791
+          "start": 1.060625,
+          "end": 1.656958
         },
         {
           "text": "dolu",
-          "start": 1.742791,
-          "end": 1.983166
+          "start": 1.656958,
+          "end": 1.8863329999999998
         },
         {
           "text": "terfi",
-          "start": 1.983166,
-          "end": 2.331707
+          "start": 1.8863329999999998,
+          "end": 2.218874
         },
         {
           "text": "dosyan",
-          "start": 2.33175,
-          "end": 2.8005
+          "start": 2.2188749999999997,
+          "end": 2.666125
         },
         {
           "text": "tek",
-          "start": 2.8125,
-          "end": 2.992791
+          "start": 2.677625,
+          "end": 2.849625
         },
         {
           "text": "dokunuşla",
-          "start": 2.992791,
-          "end": 3.521624
+          "start": 2.849625,
+          "end": 3.354208
         },
         {
           "text": "hazır",
-          "start": 3.521625,
-          "end": 3.882208
+          "start": 3.354208,
+          "end": 3.698249
         }
-      ]
+      ],
+      "duration": 3.798249
     },
     {
-      "file": "voice/promo/6/audio.mp3",
-      "duration": 6.672,
+      "sentences": [
+        {
+          "file": "voice/promo/6-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 1.8775000000000002
+        },
+        {
+          "file": "voice/promo/6-1/audio.mp3",
+          "at": 1.991625,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.668791
+        }
+      ],
       "words": [
         {
           "text": "Şirket",
-          "start": 0.048083,
-          "end": 0.492791
+          "start": 0.04,
+          "end": 0.46429099999999995
         },
         {
           "text": "sistemlerine",
-          "start": 0.492791,
-          "end": 1.165874
+          "start": 0.46429099999999995,
+          "end": 1.106499
         },
         {
           "text": "bağlanmaz",
-          "start": 1.165875,
-          "end": 1.863
+          "start": 1.1064999999999998,
+          "end": 1.771625
         },
         {
           "text": "Veriler",
-          "start": 2.944708,
-          "end": 3.533666
+          "start": 2.031625,
+          "end": 2.5935409999999997
         },
         {
           "text": "senin",
-          "start": 3.533666,
-          "end": 3.942332
+          "start": 2.5935409999999997,
+          "end": 2.983457
         },
         {
           "text": "istediğin",
-          "start": 4.0625,
-          "end": 4.567291
+          "start": 3.098125,
+          "end": 3.5797909999999997
         },
         {
           "text": "an",
-          "start": 4.567291,
-          "end": 4.747582
+          "start": 3.5797909999999997,
+          "end": 3.751791
         },
         {
           "text": "indir",
-          "start": 4.747583,
-          "end": 5.024041
+          "start": 3.751791,
+          "end": 4.015541000000001
         },
         {
           "text": "ya",
-          "start": 5.024041,
-          "end": 5.144249
+          "start": 4.015583,
+          "end": 4.130249000000001
         },
         {
           "text": "da",
-          "start": 5.14425,
-          "end": 5.276458
+          "start": 4.13025,
+          "end": 4.256375
         },
         {
           "text": "sil",
-          "start": 5.276458,
-          "end": 5.588958
+          "start": 4.256375,
+          "end": 4.554541
         }
-      ]
+      ],
+      "duration": 4.654541
     },
     {
-      "file": "voice/promo/7/audio.mp3",
-      "duration": 6.696,
+      "sentences": [
+        {
+          "file": "voice/promo/7-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.313332
+        },
+        {
+          "file": "voice/promo/7-1/audio.mp3",
+          "at": 2.427457,
+          "trimStart": 0.005874999999999998,
+          "trimEnd": 2.6114580000000003
+        }
+      ],
       "words": [
         {
           "text": "Promotly",
-          "start": 0.048083,
-          "end": 0.697124
+          "start": 0.04,
+          "end": 0.6707500000000001
         },
         {
-          "text": "Terfi",
-          "start": 1.73075,
-          "end": 2.223541
+          "text": "terfi",
+          "start": 0.831291,
+          "end": 1.198249
         },
         {
           "text": "ve",
-          "start": 2.247583,
-          "end": 2.367791
+          "start": 1.1982499999999998,
+          "end": 1.3244159999999998
         },
         {
           "text": "başarı",
-          "start": 2.367791,
-          "end": 2.752416
+          "start": 1.3244159999999998,
+          "end": 1.679916
         },
         {
           "text": "arşivin",
-          "start": 2.752416,
-          "end": 3.317332
+          "start": 1.679916,
+          "end": 2.207457
         },
         {
-          "text": "Ücretsiz",
-          "start": 4.387,
-          "end": 5.16825
+          "text": "App",
+          "start": 2.467457,
+          "end": 2.605082
         },
         {
-          "text": "başla",
-          "start": 5.16825,
-          "end": 5.588916
+          "text": "Store",
+          "start": 2.777082,
+          "end": 3.1325819999999998
+        },
+        {
+          "text": "ve",
+          "start": 3.1325819999999998,
+          "end": 3.2587479999999998
+        },
+        {
+          "text": "Google",
+          "start": 3.2587479999999998,
+          "end": 3.6486639999999997
+        },
+        {
+          "text": "Play’de",
+          "start": 3.671582,
+          "end": 4.1302900000000005
+        },
+        {
+          "text": "ücretsiz",
+          "start": 4.290832,
+          "end": 4.93304
         }
-      ]
+      ],
+      "duration": 5.03304
     }
   ],
   "story": [
     {
-      "file": "voice/story/0/audio.mp3",
-      "duration": 3.84,
+      "sentences": [
+        {
+          "file": "voice/story/0-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.768916
+        }
+      ],
       "words": [
         {
           "text": "Geçen",
-          "start": 0.0462909,
-          "end": 0.3934989
+          "start": 0.04,
+          "end": 0.377833
         },
         {
           "text": "yıl",
-          "start": 0.3935,
-          "end": 0.555541
+          "start": 0.3778341,
+          "end": 0.5355001
         },
         {
           "text": "performans",
-          "start": 0.555541,
-          "end": 1.180541
+          "start": 0.5355001,
+          "end": 1.1436251
         },
         {
           "text": "görüşmemde",
-          "start": 1.180541,
-          "end": 1.736082
+          "start": 1.1436251,
+          "end": 1.6841660999999999
         },
         {
           "text": "resmen",
-          "start": 1.736125,
-          "end": 2.129625
+          "start": 1.6841671,
+          "end": 2.0670421
         },
         {
           "text": "boş",
-          "start": 2.129625,
-          "end": 2.361125
+          "start": 2.0670421,
+          "end": 2.2922501
         },
         {
           "text": "kaldım",
-          "start": 2.361125,
-          "end": 2.743083
+          "start": 2.2922501,
+          "end": 2.6638751
         }
-      ]
+      ],
+      "duration": 2.7638751
     },
     {
-      "file": "voice/story/1/audio.mp3",
-      "duration": 7.008,
+      "sentences": [
+        {
+          "file": "voice/story/1-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.588749
+        },
+        {
+          "file": "voice/story/1-1/audio.mp3",
+          "at": 2.7037081,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.295916
+        }
+      ],
       "words": [
         {
           "text": "Yöneticim",
-          "start": 0.0462909,
-          "end": 0.5787069
+          "start": 0.04,
+          "end": 0.5579999999999999
         },
         {
           "text": "son",
-          "start": 0.578708,
-          "end": 0.810166
+          "start": 0.5580421,
+          "end": 0.7832501
         },
         {
           "text": "altı",
-          "start": 0.810166,
-          "end": 1.076374
+          "start": 0.7832501,
+          "end": 1.0422501
         },
         {
           "text": "ayda",
-          "start": 1.076375,
-          "end": 1.365708
+          "start": 1.0422501,
+          "end": 1.3237911
         },
         {
           "text": "neler",
-          "start": 1.36575,
-          "end": 1.689833
+          "start": 1.3237921,
+          "end": 1.6390831
         },
         {
           "text": "yaptığımı",
-          "start": 1.689833,
-          "end": 2.106499
+          "start": 1.6390841,
+          "end": 2.0445001
         },
         {
           "text": "sordu",
-          "start": 2.1065,
-          "end": 2.557875
+          "start": 2.0445001,
+          "end": 2.4837081
         },
         {
           "text": "Ben",
-          "start": 3.761583,
-          "end": 3.993083
+          "start": 2.7437081,
+          "end": 2.9689161
         },
         {
           "text": "iki",
-          "start": 4.016208,
-          "end": 4.189833
+          "start": 2.9914582000000003,
+          "end": 3.1603742
         },
         {
           "text": "hafta",
-          "start": 4.201375,
-          "end": 4.513875
+          "start": 3.1716252000000003,
+          "end": 3.4756662
         },
         {
           "text": "öncesini",
-          "start": 4.513875,
-          "end": 5.034708
+          "start": 3.4757082,
+          "end": 3.9824582
         },
         {
           "text": "bile",
-          "start": 5.034708,
-          "end": 5.231458
+          "start": 3.9824582,
+          "end": 4.1738742
         },
         {
           "text": "zor",
-          "start": 5.2315,
-          "end": 5.439833
+          "start": 4.1738752,
+          "end": 4.3765832
         },
         {
           "text": "hatırladım",
-          "start": 5.439833,
-          "end": 5.972249
+          "start": 4.3765832,
+          "end": 4.8945832000000005
         }
-      ]
+      ],
+      "duration": 4.9945832
     },
     {
-      "file": "voice/story/2/audio.mp3",
-      "duration": 2.832,
+      "sentences": [
+        {
+          "file": "voice/story/2-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 1.856791
+        }
+      ],
       "words": [
         {
           "text": "Sonra",
-          "start": 0.0462909,
-          "end": 0.4050819
+          "start": 0.04,
+          "end": 0.389083
         },
         {
           "text": "Promotly’yi",
-          "start": 0.405083,
-          "end": 0.925916
+          "start": 0.3890841,
+          "end": 0.8958341
         },
         {
           "text": "denemeye",
-          "start": 0.925916,
-          "end": 1.307874
+          "start": 0.8958751,
+          "end": 1.2675001
         },
         {
           "text": "başladım",
-          "start": 1.307875,
-          "end": 1.805541
+          "start": 1.2675001,
+          "end": 1.7517501
         }
-      ]
+      ],
+      "duration": 1.8517501
     },
     {
-      "file": "voice/story/3/audio.mp3",
-      "duration": 7.944,
+      "sentences": [
+        {
+          "file": "voice/story/3-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 3.320708
+        },
+        {
+          "file": "voice/story/3-1/audio.mp3",
+          "at": 3.4356671000000003,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.678833
+        }
+      ],
       "words": [
         {
           "text": "Her",
-          "start": 0.0462909,
-          "end": 0.2893319
+          "start": 0.04,
+          "end": 0.27649999999999997
         },
         {
           "text": "cuma",
-          "start": 0.300916,
-          "end": 0.613416
+          "start": 0.2877501,
+          "end": 0.5917911
         },
         {
           "text": "bilgisayarı",
-          "start": 0.706,
-          "end": 1.331
+          "start": 0.6818751,
+          "end": 1.2900001
         },
         {
           "text": "kapatmadan",
-          "start": 1.331,
-          "end": 1.921291
+          "start": 1.2900001,
+          "end": 1.8643331
         },
         {
           "text": "önce",
-          "start": 1.932875,
-          "end": 2.1875
+          "start": 1.8755841,
+          "end": 2.1233341
         },
         {
           "text": "beş",
-          "start": 2.1875,
-          "end": 2.407416
+          "start": 2.1233341,
+          "end": 2.3372921
         },
         {
           "text": "dakika",
-          "start": 2.407416,
-          "end": 2.777791
+          "start": 2.3372921,
+          "end": 2.6976671
         },
         {
           "text": "ayırıyorum",
-          "start": 2.777791,
-          "end": 3.310207
+          "start": 2.6976671,
+          "end": 3.2156671
         },
         {
           "text": "O",
-          "start": 4.328708,
-          "end": 4.386583
+          "start": 3.4756671000000003,
+          "end": 3.5319581
         },
         {
           "text": "hafta",
-          "start": 4.444458,
-          "end": 4.733791
+          "start": 3.5882922,
+          "end": 3.8698332000000004
         },
         {
           "text": "ne",
-          "start": 4.733791,
-          "end": 4.872666
+          "start": 3.8698342,
+          "end": 4.0049592
         },
         {
           "text": "yaptım",
-          "start": 4.872666,
-          "end": 5.266166
+          "start": 4.0049592,
+          "end": 4.3878342
         },
         {
           "text": "etkisi",
-          "start": 5.42825,
-          "end": 5.833333
+          "start": 4.5455012,
+          "end": 4.9396262
         },
         {
           "text": "ne",
-          "start": 5.833333,
-          "end": 5.972208
+          "start": 4.9396262,
+          "end": 5.074751200000001
         },
         {
           "text": "oldu",
-          "start": 5.983791,
-          "end": 6.319457
+          "start": 5.0860422000000005,
+          "end": 5.4126252
         },
         {
           "text": "yazıyorum",
-          "start": 6.423625,
-          "end": 6.932875
+          "start": 5.5139592,
+          "end": 6.0094592
         }
-      ]
+      ],
+      "duration": 6.1094592
     },
     {
-      "file": "voice/story/4/audio.mp3",
-      "duration": 4.608,
+      "sentences": [
+        {
+          "file": "voice/story/4-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 3.534708
+        }
+      ],
       "words": [
         {
           "text": "Uygulama",
-          "start": 0.0462909,
-          "end": 0.4397909
+          "start": 0.04,
+          "end": 0.422875
         },
         {
           "text": "bunu",
-          "start": 0.439833,
-          "end": 0.740749
+          "start": 0.4228751,
+          "end": 0.7156661
         },
         {
           "text": "yöneticime",
-          "start": 0.879625,
-          "end": 1.388875
+          "start": 0.8508341,
+          "end": 1.3462920999999999
         },
         {
           "text": "direkt",
-          "start": 1.388875,
-          "end": 1.701375
+          "start": 1.3462920999999999,
+          "end": 1.6503330999999999
         },
         {
           "text": "gönderebileceğim",
-          "start": 1.701375,
-          "end": 2.46525
+          "start": 1.6503751,
+          "end": 2.3936251
         },
         {
           "text": "üç",
-          "start": 2.476833,
-          "end": 2.592583
+          "start": 2.4048751,
+          "end": 2.5175001
         },
         {
           "text": "maddeye",
-          "start": 2.650458,
-          "end": 3.020833
+          "start": 2.5737921,
+          "end": 2.9341671
         },
         {
           "text": "çeviriyor",
-          "start": 3.020833,
-          "end": 3.530083
+          "start": 2.9341671,
+          "end": 3.4296671
         }
-      ]
+      ],
+      "duration": 3.5296671
     },
     {
-      "file": "voice/story/5/audio.mp3",
-      "duration": 6.72,
+      "sentences": [
+        {
+          "file": "voice/story/5-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.836499
+        },
+        {
+          "file": "voice/story/5-1/audio.mp3",
+          "at": 2.9514581,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 1.958083
+        }
+      ],
       "words": [
         {
           "text": "Bu",
-          "start": 0.0462909,
-          "end": 0.1736239
+          "start": 0.04,
+          "end": 0.163875
         },
         {
           "text": "dönem",
-          "start": 0.173625,
-          "end": 0.451416
+          "start": 0.1638751,
+          "end": 0.4341251
         },
         {
           "text": "görüşmeye",
-          "start": 0.462958,
-          "end": 0.925916
+          "start": 0.4454171,
+          "end": 0.8958751
         },
         {
           "text": "altı",
-          "start": 0.949083,
-          "end": 1.226833
+          "start": 0.9183751,
+          "end": 1.1886250999999999
         },
         {
           "text": "aylık",
-          "start": 1.226833,
-          "end": 1.516166
+          "start": 1.1886671,
+          "end": 1.4702081
         },
         {
           "text": "terfi",
-          "start": 1.527791,
-          "end": 1.886582
+          "start": 1.4814591,
+          "end": 1.8305421
         },
         {
           "text": "dosyamla",
-          "start": 1.898166,
-          "end": 2.395832
+          "start": 1.8417921,
+          "end": 2.3260421
         },
         {
           "text": "girdim",
-          "start": 2.395833,
-          "end": 2.812499
+          "start": 2.3260421,
+          "end": 2.7314580999999998
         },
         {
           "text": "Her",
-          "start": 3.854166,
-          "end": 4.062499
+          "start": 2.9914581,
+          "end": 3.1941661
         },
         {
           "text": "katkının",
-          "start": 4.108791,
-          "end": 4.594916
+          "start": 3.2392082,
+          "end": 3.7121662
         },
         {
           "text": "yanında",
-          "start": 4.6065,
-          "end": 4.988416
+          "start": 3.7234582,
+          "end": 4.0950832
         },
         {
           "text": "kanıtı",
-          "start": 4.988416,
-          "end": 5.324082
+          "start": 4.0950832,
+          "end": 4.4216242
         },
         {
           "text": "vardı",
-          "start": 5.324083,
-          "end": 5.717583
+          "start": 4.4216252,
+          "end": 4.8045002
         }
-      ]
+      ],
+      "duration": 4.9045002
     },
     {
-      "file": "voice/story/6/audio.mp3",
-      "duration": 4.992,
+      "sentences": [
+        {
+          "file": "voice/story/6-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.0144159999999998
+        },
+        {
+          "file": "voice/story/6-1/audio.mp3",
+          "at": 2.1293751,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 1.1585830000000001
+        }
+      ],
       "words": [
         {
           "text": "İlk",
-          "start": 0.0462909,
-          "end": 0.2083319
+          "start": 0.04,
+          "end": 0.197666
         },
         {
           "text": "defa",
-          "start": 0.266208,
-          "end": 0.601874
+          "start": 0.2539591,
+          "end": 0.5805421
         },
         {
           "text": "ne",
-          "start": 0.636583,
-          "end": 0.775458
+          "start": 0.6143341,
+          "end": 0.7494590999999999
         },
         {
           "text": "söyleyeceğimi",
-          "start": 0.775458,
-          "end": 1.388874
+          "start": 0.7494590999999999,
+          "end": 1.3462920999999999
         },
         {
           "text": "düşünmedim",
-          "start": 1.388875,
-          "end": 1.967583
+          "start": 1.3462920999999999,
+          "end": 1.9093750999999999
         },
         {
           "text": "Hepsi",
-          "start": 2.974541,
-          "end": 3.368041
+          "start": 2.1693751,
+          "end": 2.5522500999999997
         },
         {
           "text": "önümdeydi",
-          "start": 3.379625,
-          "end": 4.016208
+          "start": 2.5635421999999997,
+          "end": 3.1829172
         }
-      ]
+      ],
+      "duration": 3.2829172
     },
     {
-      "file": "voice/story/7/audio.mp3",
-      "duration": 4.656,
+      "sentences": [
+        {
+          "file": "voice/story/7-0/audio.mp3",
+          "at": 0,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 1.4175820000000001
+        },
+        {
+          "file": "voice/story/7-1/audio.mp3",
+          "at": 1.5325411,
+          "trimStart": 0.005040900000000001,
+          "trimEnd": 2.780166
+        }
+      ],
       "words": [
         {
           "text": "Sen",
-          "start": 0.0462909,
-          "end": 0.3124989
+          "start": 0.04,
+          "end": 0.299
         },
         {
           "text": "de",
-          "start": 0.335666,
-          "end": 0.474541
+          "start": 0.3215421,
+          "end": 0.4566671
         },
         {
           "text": "bu",
-          "start": 0.474541,
-          "end": 0.613416
+          "start": 0.4566671,
+          "end": 0.5917920999999999
         },
         {
           "text": "cuma",
-          "start": 0.613416,
-          "end": 0.925916
+          "start": 0.5917920999999999,
+          "end": 0.8958330999999999
         },
         {
           "text": "başla",
-          "start": 0.9375,
-          "end": 1.354166
+          "start": 0.9071251,
+          "end": 1.3125411
         },
         {
           "text": "Promotly",
-          "start": 2.361125,
-          "end": 2.939833
+          "start": 1.5725411,
+          "end": 2.1243321
+        },
+        {
+          "text": "App",
+          "start": 2.2707502,
+          "end": 2.3946252
+        },
+        {
+          "text": "Store",
+          "start": 2.4058752,
+          "end": 2.7662502
+        },
+        {
+          "text": "ve",
+          "start": 2.7662502,
+          "end": 2.8788332
+        },
+        {
+          "text": "Google",
+          "start": 2.8788332,
+          "end": 3.2054162
+        },
+        {
+          "text": "Play’de",
+          "start": 3.2054162,
+          "end": 3.5657912
         },
         {
           "text": "ücretsiz",
-          "start": 3.078708,
-          "end": 3.703708
+          "start": 3.5657912,
+          "end": 4.207666199999999
         }
-      ]
+      ],
+      "duration": 4.3076662
     }
   ]
 }

@@ -1,5 +1,6 @@
 import React from 'react';
-import { AbsoluteFill, Img, OffthreadVideo, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { Sentence, VOICE_VOLUME } from './timeline';
 import { C, GRAD, INTER } from './theme';
 
 const SCREEN_W = 1080;
@@ -18,11 +19,14 @@ export const Phone: React.FC<{
   progress?: number; // 0..1 for zoom animation
   maskBottom?: number; // px of the raw screen to cover (hides the ADB keyboard strip)
   statusBar?: string; // paint the status strip in this colour (for dark screens)
+  ios?: boolean; // replace the Android status strip with an iOS one + Dynamic Island
+  bare?: boolean; // no bezel or rounding (plain screen)
+  patches?: Patch[]; // cover screen regions (raw px), optionally with replacement text
   shadow?: boolean;
   style?: React.CSSProperties;
-}> = ({ src, video, startFrom = 0, playbackRate = 1, width, zoom, progress = 0, maskBottom = 0, statusBar, shadow = true, style }) => {
+}> = ({ src, video, startFrom = 0, playbackRate = 1, width, zoom, progress = 0, maskBottom = 0, statusBar, ios, bare, patches, shadow = true, style }) => {
   const { fps } = useVideoConfig();
-  const bezel = width * 0.028;
+  const bezel = bare ? 0 : width * 0.028;
   const inner = width - bezel * 2;
   const scale = inner / SCREEN_W;
   const height = inner * (SCREEN_H / SCREEN_W) + bezel * 2;
@@ -32,7 +36,7 @@ export const Phone: React.FC<{
       style={{
         width,
         height,
-        borderRadius: width * 0.13,
+        borderRadius: bare ? 0 : width * 0.13,
         background: '#0D1424',
         padding: bezel,
         boxSizing: 'border-box',
@@ -40,7 +44,7 @@ export const Phone: React.FC<{
         position: 'relative',
         ...style,
       }}>
-      <div style={{ width: inner, height: inner * (SCREEN_H / SCREEN_W), borderRadius: width * 0.105, overflow: 'hidden', position: 'relative', background: C.bg }}>
+      <div style={{ width: inner, height: inner * (SCREEN_H / SCREEN_W), borderRadius: bare ? 0 : width * 0.105, overflow: 'hidden', position: 'relative', background: C.bg }}>
         <div
           style={{
             width: SCREEN_W,
@@ -53,11 +57,18 @@ export const Phone: React.FC<{
             transform: `translate(${SCREEN_W * (zoom?.x ?? 0.5) * scale * (1 - z)}px, ${SCREEN_H * (zoom?.y ?? 0.5) * scale * (1 - z)}px) scale(${scale * z})`,
           }}>
           {video ? (
-            <OffthreadVideo src={staticFile(src)} startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} muted style={{ width: SCREEN_W, height: SCREEN_H }} />
+            <OffthreadVideo src={staticFile(src)} trimBefore={Math.round(startFrom * fps)} playbackRate={playbackRate} muted style={{ width: SCREEN_W, height: SCREEN_H }} />
           ) : (
             <Img src={staticFile(src)} style={{ width: SCREEN_W, height: SCREEN_H }} />
           )}
-          {statusBar && (
+          {patches?.map((p, i) => (
+            <div key={i} style={{ position: 'absolute', left: 0, right: 0, top: p.top, height: p.height, background: p.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: INTER, fontSize: p.fontSize ?? 29, lineHeight: 1.42, color: p.color ?? 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
+              {p.lines?.map((l) => <span key={l}>{l}</span>)}
+            </div>
+          ))}
+          {ios ? (
+            <IosStatusBar bg={statusBar ?? C.bg} dark={!!statusBar} />
+          ) : statusBar && (
             // Expo Go draws a light status strip; store builds draw edge-to-edge, so dark screens get a dark bar.
             <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 136, background: statusBar, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 64px 0 80px', fontFamily: INTER, color: C.white }}>
               <span style={{ fontSize: 40, fontWeight: 500 }}>9:41</span>
@@ -101,7 +112,7 @@ export const FullScreen: React.FC<{
     <AbsoluteFill style={{ background: C.bg, overflow: 'hidden' }}>
       <div style={{ position: 'absolute', left, top, width: SCREEN_W, height: SCREEN_H, transform: `scale(${s})`, transformOrigin: '0 0' }}>
         {video ? (
-          <OffthreadVideo src={staticFile(src)} startFrom={Math.round(startFrom * fps)} playbackRate={playbackRate} muted style={{ width: SCREEN_W, height: SCREEN_H }} />
+          <OffthreadVideo src={staticFile(src)} trimBefore={Math.round(startFrom * fps)} playbackRate={playbackRate} muted style={{ width: SCREEN_W, height: SCREEN_H }} />
         ) : (
           <Img src={staticFile(src)} style={{ width: SCREEN_W, height: SCREEN_H }} />
         )}
@@ -220,3 +231,73 @@ export const Background: React.FC<{ kind: keyof typeof GRAD }> = ({ kind }) => (
     )}
   </AbsoluteFill>
 );
+
+// Voice-over for one scene: trimmed sentences placed back to back with short breaths (see scripts/voice.mjs).
+export const Voice: React.FC<{ sentences: Sentence[]; at: number }> = ({ sentences, at }) => {
+  const { fps } = useVideoConfig();
+  return (
+    <>
+      {sentences.map((s, i) => (
+        <Sequence key={i} from={Math.round((at + s.at) * fps)} layout="none">
+          <Audio src={staticFile(s.file)} trimBefore={Math.round(s.trimStart * fps)} trimAfter={Math.round(s.trimEnd * fps)} volume={VOICE_VOLUME} />
+        </Sequence>
+      ))}
+    </>
+  );
+};
+
+// Both stores, as neutral text badges (official badge artwork has its own usage rules).
+export const StoreBadges: React.FC<{ size: number }> = ({ size }) => (
+  <div style={{ display: 'flex', gap: size * 0.5, fontFamily: INTER }}>
+    {[
+      ['Şimdi indir', 'App Store'],
+      ['Şimdi indir', 'Google Play'],
+    ].map(([small, big]) => (
+      <div
+        key={big}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          padding: `${size * 0.38}px ${size * 0.9}px`,
+          borderRadius: size * 0.5,
+          background: '#000',
+          border: '2px solid rgba(255,255,255,0.35)',
+          color: C.white,
+          boxShadow: '0 12px 30px rgba(0,0,0,0.3)',
+        }}>
+        <span style={{ fontSize: size * 0.42, fontWeight: 600, opacity: 0.8, lineHeight: 1.1 }}>{small}</span>
+        <span style={{ fontSize: size, fontWeight: 800, letterSpacing: -size * 0.02, lineHeight: 1.1 }}>{big}</span>
+      </div>
+    ))}
+  </div>
+);
+
+export type Patch = { top: number; height: number; bg: string; lines?: string[]; fontSize?: number; color?: string };
+
+// iOS-style status bar drawn over the raw Android strip (0–136 px), with a Dynamic Island.
+export const IosStatusBar: React.FC<{ bg: string; dark: boolean }> = ({ bg, dark }) => {
+  const fg = dark ? '#FFFFFF' : '#000000';
+  return (
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 136, background: bg, fontFamily: INTER }}>
+      <span style={{ position: 'absolute', left: 110, top: 46, fontSize: 44, fontWeight: 700, color: fg, letterSpacing: -0.5 }}>9:41</span>
+      <div style={{ position: 'absolute', left: '50%', top: 26, width: 330, height: 96, marginLeft: -165, borderRadius: 48, background: '#000' }} />
+      <div style={{ position: 'absolute', right: 86, top: 52, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <svg width="48" height="30" viewBox="0 0 48 30">
+          {[0, 1, 2, 3].map((i) => <rect key={i} x={i * 13} y={22 - i * 7} width="9" height={8 + i * 7} rx="2.5" fill={fg} />)}
+        </svg>
+        <svg width="42" height="30" viewBox="0 0 42 30">
+          <path d="M21 29 L28 21 A10 10 0 0 0 14 21 Z" fill={fg} />
+          <path d="M8 15 A19 19 0 0 1 34 15 L30.5 19 A14 14 0 0 0 11.5 19 Z" fill={fg} />
+          <path d="M1.5 8.5 A28 28 0 0 1 40.5 8.5 L37 12.5 A23 23 0 0 0 5 12.5 Z" fill={fg} />
+        </svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <div style={{ width: 54, height: 28, borderRadius: 9, border: `2.5px solid ${dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)'}`, padding: 3, boxSizing: 'border-box' }}>
+            <div style={{ width: '100%', height: '100%', borderRadius: 5, background: fg }} />
+          </div>
+          <div style={{ width: 4, height: 10, borderRadius: 2, background: dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)' }} />
+        </div>
+      </div>
+    </div>
+  );
+};

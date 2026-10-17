@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, Audio, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig, Easing } from 'remotion';
-import { Background, Captions, Chip, Logo, Phone } from './components';
+import { Background, Captions, Chip, Logo, Phone, StoreBadges, Voice } from './components';
 import { timeline } from './timeline';
 import { C, FPS, GRAD, INTER } from './theme';
 
@@ -135,7 +135,9 @@ const Cta: React.FC<{ f: number; L: Layout }> = ({ f, L }) => {
       <div style={{ opacity: btn, transform: `scale(${pulse})`, background: GRAD.gold, color: '#3A2300', fontWeight: 900, fontSize: L === 'v' ? 46 : 38, padding: '28px 60px', borderRadius: 999, boxShadow: '0 20px 50px rgba(245,165,36,0.45)' }}>
         Ücretsiz başla
       </div>
-      <div style={{ opacity: btn, color: 'rgba(255,255,255,0.75)', fontSize: L === 'v' ? 32 : 28, fontWeight: 600 }}>Google Play’de · Promotly</div>
+      <div style={{ opacity: btn, transform: `translateY(${(1 - btn) * 20}px)` }}>
+        <StoreBadges size={L === 'v' ? 40 : 34} />
+      </div>
     </div>
   );
 };
@@ -199,9 +201,7 @@ export const Promo: React.FC<{ layout: Layout }> = ({ layout }) => {
       {scenes.map((s) => (
         <Sequence key={s.scene} from={s.from} durationInFrames={s.frames + 8} premountFor={FPS}>
           <Scene scene={s} L={layout} />
-          <Sequence from={Math.round(s.voiceAt * FPS)}>
-            <Audio src={staticFile(s.file)} volume={1} />
-          </Sequence>
+          <Voice sentences={s.sentences} at={s.voiceAt} />
         </Sequence>
       ))}
     </AbsoluteFill>
