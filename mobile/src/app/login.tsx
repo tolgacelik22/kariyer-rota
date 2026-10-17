@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Button, haptic, Pressy, T } from '@/components/ui';
+import { Ambient, Button, haptic, Pressy, T } from '@/components/ui';
 import { C, F, R } from '@/constants/theme';
 import { api, API_URL, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -70,7 +70,9 @@ export default function Login() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <Ambient variant="default" />
+      <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1, padding: 24 }}>
         {step === 'code' && (
           <Pressy onPress={() => setStep('email')} style={styles.back} hitSlop={10}>
@@ -170,18 +172,19 @@ export default function Login() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  back: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center' },
-  inputWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: C.white, borderRadius: R.lg, paddingHorizontal: 16, height: 58, borderWidth: 1.5, borderColor: C.line },
+  back: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' , borderWidth: 1, borderColor: C.line},
+  inputWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: C.card, borderRadius: R.lg, paddingHorizontal: 16, height: 58, borderWidth: 1.5, borderColor: C.line },
   input: { flex: 1, fontFamily: F.medium, fontSize: 17, color: C.ink, height: '100%', outlineStyle: 'none' } as any,
   consent: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
-  check: { width: 24, height: 24, borderRadius: 8, borderWidth: 2, borderColor: C.line, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
+  check: { width: 24, height: 24, borderRadius: 8, borderWidth: 2, borderColor: C.line, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   checkOn: { backgroundColor: C.brand, borderColor: C.brand },
   codeRow: { flexDirection: 'row', gap: 8, width: '100%' },
-  codeBox: { flex: 1, height: 62, borderRadius: R.md, backgroundColor: C.white, borderWidth: 1.5, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  codeBox: { flex: 1, height: 62, borderRadius: R.md, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   codeBoxActive: { borderColor: C.brand, borderWidth: 2 },
   codeBoxFilled: { borderColor: C.brandBright },
   hidden: { position: 'absolute', opacity: 0, height: 1, width: 1 },

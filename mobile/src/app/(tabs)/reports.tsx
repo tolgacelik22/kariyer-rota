@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Card, IconBubble, IconName, ProBadge, Pressy, T } from '@/components/ui';
-import { C, F, GRADIENTS, R } from '@/constants/theme';
+import { Ambient, Card, IconBubble, IconName, ProBadge, Pressy, T } from '@/components/ui';
+import { C, F, GRADIENTS, R, TAB_BAR_SPACE } from '@/constants/theme';
 import { api, Report, ReportMeta, ReportType } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useFocusData } from '@/lib/hooks';
@@ -43,7 +43,9 @@ export default function Reports() {
   const [hero, ...rest] = TYPES;
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <Ambient variant="warm" />
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={C.brand} />}>
         <View>
           <T v="title">Raporlar</T>
@@ -60,8 +62,8 @@ export default function Reports() {
             <T v="title" style={{ color: C.white, marginTop: 16 }}>{hero.title}</T>
             <T v="body" style={{ color: 'rgba(255,255,255,0.7)', marginTop: 6 }}>{hero.text}</T>
             <View style={styles.heroCta}>
-              <Ionicons name="sparkles" size={16} color="#3A2300" />
-              <T v="bodyStrong" style={{ color: '#3A2300' }}>Dosyamı hazırla</T>
+              <Ionicons name="sparkles" size={16} color={C.onAccent} />
+              <T v="bodyStrong" style={{ color: C.onAccent }}>Dosyamı hazırla</T>
             </View>
           </LinearGradient>
         </Pressy>
@@ -111,6 +113,7 @@ export default function Reports() {
       </ScrollView>
       {generating && <Generating type={generating} />}
     </SafeAreaView>
+    </View>
   );
 }
 
@@ -148,11 +151,11 @@ function Generating({ type }: { type: ReportType }) {
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 20, gap: 18, paddingBottom: 40 },
+  scroll: { padding: 20, gap: 18, paddingBottom: TAB_BAR_SPACE },
   hero: { borderRadius: R.xl, padding: 22, overflow: 'hidden' },
   heroOrb: { position: 'absolute', width: 240, height: 240, borderRadius: 120, backgroundColor: 'rgba(245,165,36,0.10)', right: -80, top: -80 },
   heroCta: { flexDirection: 'row', gap: 8, alignItems: 'center', alignSelf: 'flex-start', backgroundColor: C.gold, paddingHorizontal: 16, paddingVertical: 11, borderRadius: R.md, marginTop: 18 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.white, padding: 16, borderRadius: R.md },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, padding: 16, borderRadius: R.md , borderWidth: 1, borderColor: C.line},
   overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11,18,32,0.55)', justifyContent: 'center', padding: 24 },
   spinner: { width: 64, height: 64, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
 });

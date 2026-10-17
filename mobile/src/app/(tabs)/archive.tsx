@@ -4,9 +4,9 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Button, Card, Chip, ProBadge, Pressy, T } from '@/components/ui';
+import { Ambient, Button, Card, Chip, ProBadge, Pressy, T } from '@/components/ui';
 import Markdown from '@/components/Markdown';
-import { C, F, R } from '@/constants/theme';
+import { C, F, R, TAB_BAR_SPACE } from '@/constants/theme';
 import { api, Entry } from '@/lib/api';
 import { useEntries } from '@/lib/hooks';
 import { MOODS, monthKey, weekLabel, weekRange } from '@/lib/format';
@@ -51,7 +51,9 @@ export default function Archive() {
   }
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <Ambient variant="calm" />
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={C.brand} />}>
         <View>
           <T v="title">Arşiv</T>
@@ -163,12 +165,13 @@ export default function Archive() {
         )}
       </ScrollView>
     </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 20, gap: 16, paddingBottom: 40 },
-  locked: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 16, borderRadius: R.lg, backgroundColor: C.white, opacity: 0.75, borderWidth: 1, borderColor: C.line, borderStyle: 'dashed' },
+  scroll: { padding: 20, gap: 16, paddingBottom: TAB_BAR_SPACE },
+  locked: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 16, borderRadius: R.lg, backgroundColor: C.card, opacity: 0.75, borderWidth: 1, borderColor: C.line, borderStyle: 'dashed' },
   impact: { flexDirection: 'row', gap: 6, alignItems: 'flex-start', marginTop: 8, backgroundColor: C.greenSoft, padding: 10, borderRadius: R.sm },
   ai: { backgroundColor: C.brandSoft, padding: 12, borderRadius: R.md },
   link: { flexDirection: 'row', gap: 6, alignItems: 'center', backgroundColor: C.brandSoft, padding: 10, borderRadius: R.sm },

@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Button, Card, Divider, haptic, IconBubble, IconName, ProBadge, Pressy, T } from '@/components/ui';
-import { C, F, GRADIENTS, R } from '@/constants/theme';
+import { Ambient, Button, Card, Divider, haptic, IconBubble, IconName, ProBadge, Pressy, T } from '@/components/ui';
+import { C, F, GRADIENTS, R, TAB_BAR_SPACE } from '@/constants/theme';
 import { api, API_URL, User } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { longDate } from '@/lib/format';
@@ -99,7 +99,9 @@ export default function Profile() {
   }
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <Ambient variant="default" />
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <T v="title">Profil</T>
 
@@ -126,8 +128,8 @@ export default function Profile() {
                 AI özetleri, terfi dosyası, sınırsız arşiv. Aylık {user.prices.monthly} TL’den başlayan fiyatlarla.
               </T>
               <View style={styles.planCta}>
-                <T v="bodyStrong" style={{ color: '#3A2300' }}>Planları gör</T>
-                <Ionicons name="arrow-forward" size={16} color="#3A2300" />
+                <T v="bodyStrong" style={{ color: C.onAccent }}>Planları gör</T>
+                <Ionicons name="arrow-forward" size={16} color={C.onAccent} />
               </View>
             </LinearGradient>
           </Pressy>
@@ -187,6 +189,7 @@ export default function Profile() {
         <T v="small" style={{ textAlign: 'center', color: C.faint }}>Promotly · Terfi ve Başarı Arşivi</T>
       </ScrollView>
     </SafeAreaView>
+    </View>
   );
 }
 
@@ -213,7 +216,7 @@ function Row({ icon, label, sub, onPress, danger }: { icon: IconName; label: str
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: 20, gap: 16, paddingBottom: 40 },
+  scroll: { padding: 20, gap: 16, paddingBottom: TAB_BAR_SPACE },
   plan: { borderRadius: R.xl, padding: 20 },
   planCta: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', backgroundColor: C.gold, paddingHorizontal: 14, paddingVertical: 9, borderRadius: R.md, marginTop: 14 },
   input: { backgroundColor: C.bg, borderRadius: R.md, paddingHorizontal: 14, height: 48, fontFamily: F.medium, fontSize: 15, color: C.ink, outlineStyle: 'none' } as any,

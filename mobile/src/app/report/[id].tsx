@@ -92,7 +92,7 @@ export default function ReportView() {
 
 const styles = StyleSheet.create({
   top: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10 },
-  iconBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center' },
+  iconBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' , borderWidth: 1, borderColor: C.line},
   upsell: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: C.brandSoft, padding: 14, borderRadius: R.md },
   footer: { padding: 20, paddingTop: 10 },
 });

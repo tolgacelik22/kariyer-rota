@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Button, Chip, IconBubble, Pressy, T } from '@/components/ui';
+import { Ambient, Button, Chip, IconBubble, Pressy, T } from '@/components/ui';
 import { C, F, GRADIENTS, R, SHADOW } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 
@@ -60,7 +60,9 @@ export default function Onboarding() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <Ambient variant="warm" />
+      <SafeAreaView style={{ flex: 1 }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       <View style={styles.top}>
         <View style={styles.brandRow}>
           <LinearGradient colors={GRADIENTS.brand} style={styles.logo}>
@@ -118,6 +120,7 @@ export default function Onboarding() {
         <Button title={last ? 'Başlayalım' : 'Devam'} icon={last ? 'arrow-forward' : undefined} onPress={next} />
       </View>
     </SafeAreaView>
+    </View>
   );
 }
 
@@ -207,11 +210,11 @@ const styles = StyleSheet.create({
   dots: { flexDirection: 'row', gap: 6, justifyContent: 'center' },
   dot: { height: 8, borderRadius: 4 },
   bubble: { padding: 16, borderRadius: R.lg, maxWidth: '88%' },
-  bubbleLeft: { backgroundColor: C.white, alignSelf: 'flex-start', borderBottomLeftRadius: 6, ...SHADOW },
+  bubbleLeft: { backgroundColor: C.card, alignSelf: 'flex-start', borderBottomLeftRadius: 6, ...SHADOW , borderWidth: 1, borderColor: C.line},
   bubbleRight: { backgroundColor: C.brand, alignSelf: 'flex-end', borderBottomRightRadius: 6 },
   monthRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
-  month: { alignItems: 'center', gap: 6, backgroundColor: C.white, borderRadius: R.md, paddingVertical: 10, width: '15%' },
-  mock: { backgroundColor: C.white, borderRadius: R.xl, padding: 20 },
+  month: { alignItems: 'center', gap: 6, backgroundColor: C.card, borderRadius: R.md, paddingVertical: 10, width: '15%' , borderWidth: 1, borderColor: C.line},
+  mock: { backgroundColor: C.card, borderRadius: R.xl, padding: 20 , borderWidth: 1, borderColor: C.line},
   line: { height: 8, borderRadius: 4, backgroundColor: C.lineSoft, marginTop: 8 },
   shield: { width: 120, height: 120, borderRadius: 40, alignItems: 'center', justifyContent: 'center' },
 });

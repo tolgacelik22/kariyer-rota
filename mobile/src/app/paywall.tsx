@@ -81,7 +81,7 @@ export default function Paywall() {
       <LinearGradient colors={GRADIENTS.night} style={{ flex: 1 }}>
         <SafeAreaView style={styles.doneWrap}>
           <LinearGradient colors={GRADIENTS.gold} style={styles.doneIcon}>
-            <Ionicons name="star" size={46} color="#3A2300" />
+            <Ionicons name="star" size={46} color={C.onAccent} />
           </LinearGradient>
           <T v="hero" style={{ color: C.white, textAlign: 'center' }}>Pro’ya hoş geldin</T>
           <T v="body" style={{ color: 'rgba(255,255,255,0.7)', textAlign: 'center' }}>
@@ -119,7 +119,7 @@ export default function Paywall() {
 
         <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <LinearGradient colors={GRADIENTS.gold} style={styles.crown}>
-            <Ionicons name="trophy" size={30} color="#3A2300" />
+            <Ionicons name="trophy" size={30} color={C.onAccent} />
           </LinearGradient>
           <T v="label" style={{ color: C.gold, textAlign: 'center' }}>Promotly Pro</T>
           <T v="hero" style={{ color: C.white, textAlign: 'center', marginTop: 8 }}>{head.title}</T>
@@ -149,7 +149,7 @@ export default function Paywall() {
                     <View style={[styles.plan, active && styles.planActive]}>
                       {p.id === 'yearly' && !!p.savePct && (
                         <LinearGradient colors={GRADIENTS.gold} style={styles.saveBadge}>
-                          <T v="small" style={{ color: '#3A2300', fontFamily: F.black, fontSize: 11 }}>%{p.savePct} TASARRUF</T>
+                          <T v="small" style={{ color: C.onAccent, fontFamily: F.black, fontSize: 11 }}>%{p.savePct} TASARRUF</T>
                         </LinearGradient>
                       )}
                       <View style={[styles.radio, active && styles.radioOn]}>{active && <View style={styles.radioDot} />}</View>
